@@ -13,7 +13,7 @@ uniform mat4 projection;
 uniform float width;
 uniform float pixel;
 
-varying vec2 fragLoc;
+// varying vec2 fragLoc;
 
 void main() {
     // get camera vectors from modelview matrix
@@ -31,7 +31,7 @@ void main() {
     vertex += ext * loc.y * normalize(v);
 
     // write fragment location for calculating caps and antialiasing
-    fragLoc = loc;
+//  fragLoc = loc;
 
     // transform resulting vertex with modelview and projection matrices
     gl_Position = projection * modelview * vec4(vertex, 1.0);

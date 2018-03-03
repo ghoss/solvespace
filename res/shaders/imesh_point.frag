@@ -9,7 +9,7 @@ uniform vec4 color;
 uniform float pixel;
 uniform float width;
 
-varying vec2 fragLoc;
+// varying vec2 fragLoc;
 
 void main() {
     // Rectangular points

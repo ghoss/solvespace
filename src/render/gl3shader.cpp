@@ -453,7 +453,7 @@ void EdgeRenderer::Init(const StippleAtlas *a) {
         {
             { ATTRIB_POS, "pos" },
             { ATTRIB_LOC, "loc" },
-            { ATTRIB_TAN, "tan" }
+            { ATTRIB_TAN, "tanV" }
         }
     );
 }
@@ -638,7 +638,7 @@ void OutlineRenderer::Init(const StippleAtlas *a) {
         {
             { ATTRIB_POS, "pos" },
             { ATTRIB_LOC, "loc" },
-            { ATTRIB_TAN, "tan" },
+            { ATTRIB_TAN, "tanV" },
             { ATTRIB_NOL, "nol" },
             { ATTRIB_NOR, "nor" }
         }
@@ -927,7 +927,7 @@ void IndexedMeshRenderer::Init() {
         "shaders/imesh.vert", "shaders/imesh.frag",
         {
             { ATTRIB_POS, "pos" },
-            { ATTRIB_TEX, "tex" }
+//             { ATTRIB_TEX, "tex" }
         }
     );
     texShader.Init(
