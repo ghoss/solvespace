@@ -36,7 +36,7 @@ string(SUBSTRING "${GIT_COMMIT_HASH}" 0 8 solvespace_GIT_HASH)
 
 set(ENABLE_GUI        ON CACHE BOOL
     "Whether the graphical interface is enabled (command line interface always is)")
-set(ENABLE_TESTS      ON  CACHE BOOL
+set(ENABLE_TESTS      OFF  CACHE BOOL
     "Whether the test suite will be built and run")
 set(ENABLE_COVERAGE   OFF CACHE BOOL
     "Whether code coverage information will be collected")
@@ -259,9 +259,6 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(WARNING_FLAGS   "-Wall -Wextra -Wno-unused-parameter")
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        set(WARNING_FLAGS "${WARNING_FLAGS} -Wfloat-conversion")
-    endif()
     # We rely on these -Werror flags.
     set(WARNING_FLAGS   "${WARNING_FLAGS} -Werror=switch")
 endif()
