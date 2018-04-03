@@ -168,156 +168,198 @@ void TextWindow::ScreenChangeAutosaveInterval(int link, uint32_t v) {
 
 void TextWindow::ShowConfiguration() {
     int i;
-    Printf(true, "%Ft user color (r, g, b)");
+    Printf(true, "%Ft %s (r, g, b)", _("user color"));
 
     for(i = 0; i < SS.MODEL_COLORS; i++) {
-        Printf(false, "%Bp   #%d:  %Bz  %Bp  (%@, %@, %@) %f%D%Ll%Fl[change]%E",
+        Printf(false, "%Bp   #%d:  %Bz  %Bp  (%@, %@, %@) %f%D%Ll%Fl[%s]%E",
             (i & 1) ? 'd' : 'a',
             i, &SS.modelColor[i],
             (i & 1) ? 'd' : 'a',
             SS.modelColor[i].redF(),
             SS.modelColor[i].greenF(),
             SS.modelColor[i].blueF(),
-            &ScreenChangeColor, i);
+            &ScreenChangeColor, i,
+            _("change"));
     }
 
     Printf(false, "");
-    Printf(false, "%Ft light direction               intensity");
+    Printf(false, "%Ft %S%s",
+    	_("light direction"), -30, _("intensity"));
     for(i = 0; i < 2; i++) {
-        Printf(false, "%Bp   #%d  (%2,%2,%2)%Fl%D%f%Ll[c]%E "
-                      "%2 %Fl%D%f%Ll[c]%E",
+        Printf(false, "%Bp   #%d  (%2,%2,%2)%Fl%D%f%Ll[%s]%E "
+                      "%2 %Fl%D%f%Ll[%s]%E",
             (i & 1) ? 'd' : 'a', i,
-            CO(SS.lightDir[i]), i, &ScreenChangeLightDirection,
-            SS.lightIntensity[i], i, &ScreenChangeLightIntensity);
+            CO(SS.lightDir[i]), i, &ScreenChangeLightDirection, _("c"),
+            SS.lightIntensity[i], i, &ScreenChangeLightIntensity, _("c"));
     }
 
     Printf(false, "");
-    Printf(false, "%Ft chord tolerance (in percents)%E");
-    Printf(false, "%Ba   %@ %% %Fl%Ll%f%D[change]%E; %@ mm, %d triangles",
+    Printf(false, "%Ft %s%E", _("chord tolerance (in percents)"));
+    Printf(false, "%Ba   %@ %% %Fl%Ll%f%D[%s]%E; %@ %s, %d %s",
         SS.chordTol,
-        &ScreenChangeChordTolerance, 0, SS.chordTolCalculated,
-        SK.GetGroup(SS.GW.activeGroup)->displayMesh.l.n);
-    Printf(false, "%Ft max piecewise linear segments%E");
-    Printf(false, "%Ba   %d %Fl%Ll%f[change]%E",
+        &ScreenChangeChordTolerance, 0, _("change"), SS.chordTolCalculated, _("mm"),
+        SK.GetGroup(SS.GW.activeGroup)->displayMesh.l.n, _("triangles"));
+    Printf(false, "%Ft %s%E", _("max piecewise linear segments"));
+    Printf(false, "%Ba   %d %Fl%Ll%f[%s]%E",
         SS.maxSegments,
-        &ScreenChangeMaxSegments);
+        &ScreenChangeMaxSegments,
+        _("change"));
 
     Printf(false, "");
-    Printf(false, "%Ft export chord tolerance (in mm)%E");
-    Printf(false, "%Ba   %@ %Fl%Ll%f%D[change]%E",
+    Printf(false, "%Ft %s%E", _("export chord tolerance (in mm)"));
+    Printf(false, "%Ba   %@ %Fl%Ll%f%D[%s]%E",
         SS.exportChordTol,
-        &ScreenChangeExportChordTolerance, 0);
-    Printf(false, "%Ft export max piecewise linear segments%E");
-    Printf(false, "%Ba   %d %Fl%Ll%f[change]%E",
+        &ScreenChangeExportChordTolerance, 0,
+        _("change"));
+    Printf(false, "%Ft %s%E", _("export max piecewise linear segments"));
+    Printf(false, "%Ba   %d %Fl%Ll%f[%s]%E",
         SS.exportMaxSegments,
-        &ScreenChangeExportMaxSegments);
+        &ScreenChangeExportMaxSegments,
+        _("change"));
 
     Printf(false, "");
-    Printf(false, "%Ft perspective factor (0 for parallel)%E");
-    Printf(false, "%Ba   %# %Fl%Ll%f%D[change]%E",
+    Printf(false, "%Ft %s%E", _("perspective factor (0 for parallel)"));
+    Printf(false, "%Ba   %# %Fl%Ll%f%D[%s]%E",
         SS.cameraTangent*1000,
-        &ScreenChangeCameraTangent, 0);
-    Printf(false, "%Ft snap grid spacing%E");
-    Printf(false, "%Ba   %s %Fl%Ll%f%D[change]%E",
+        &ScreenChangeCameraTangent, 0,
+        _("change"));
+
+    Printf(false, "%Ft %s%E", _("snap grid spacing"));
+    Printf(false, "%Ba   %s %Fl%Ll%f%D[%s]%E",
         SS.MmToString(SS.gridSpacing).c_str(),
-        &ScreenChangeGridSpacing, 0);
-    Printf(false, "%Ft digits after decimal point to show%E");
-    Printf(false, "%Ba   %d %Fl%Ll%f%D[change]%E (e.g. '%s')",
+        &ScreenChangeGridSpacing, 0, _("change"));
+        
+    Printf(false, "%Ft %s%E", _("digits after decimal point to show"));
+    Printf(false, "%Ba   %d %Fl%Ll%f%D[%s]%E (%s '%s')",
         SS.UnitDigitsAfterDecimal(),
-        &ScreenChangeDigitsAfterDecimal, 0,
+        &ScreenChangeDigitsAfterDecimal, 0, _("change"), _("e.g."),
         SS.MmToString(SS.StringToMm("1.23456789")).c_str());
 
     Printf(false, "");
-    Printf(false, "%Ft export scale factor (1:1=mm, 1:25.4=inch)");
-    Printf(false, "%Ba   1:%# %Fl%Ll%f%D[change]%E",
+    Printf(false, "%Ft %s%E", _("export scale factor (1:1=mm, 1:25.4=inch)"));
+    Printf(false, "%Ba   1:%# %Fl%Ll%f%D[%s]%E",
         (double)SS.exportScale,
-        &ScreenChangeExportScale, 0);
-    Printf(false, "%Ft cutter radius offset (0=no offset) ");
-    Printf(false, "%Ba   %s %Fl%Ll%f%D[change]%E",
+        &ScreenChangeExportScale, 0,
+        _("change"));
+    Printf(false, "%Ft %s%E", _("cutter radius offset (0=no offset)"));
+    Printf(false, "%Ba   %s %Fl%Ll%f%D[%s]%E",
         SS.MmToString(SS.exportOffset).c_str(),
-        &ScreenChangeExportOffset, 0);
+        &ScreenChangeExportOffset, 0,
+        _("change"));
 
     Printf(false, "");
-    Printf(false, "  %Fd%f%Ll%s  export shaded 2d triangles%E",
+    Printf(false, "  %Fd%f%Ll%s  %s%E",
         &ScreenChangeShadedTriangles,
-        SS.exportShadedTriangles ? CHECK_TRUE : CHECK_FALSE);
+        SS.exportShadedTriangles ? CHECK_TRUE : CHECK_FALSE,
+        _("export shaded 2d triangles"));
+        
     if(fabs(SS.exportOffset) > LENGTH_EPS) {
-        Printf(false, "  %Fd%s  curves as piecewise linear%E "
-                      "(since cutter radius is not zero)", CHECK_TRUE);
+        Printf(false, "  %Fd%s  %s%E ",
+                      _("(since cutter radius is not zero)"), CHECK_TRUE,
+                      _("curves as piecewise linear"));
     } else {
-        Printf(false, "  %Fd%f%Ll%s  export curves as piecewise linear%E",
+        Printf(false, "  %Fd%f%Ll%s  %s%E",
             &ScreenChangePwlCurves,
-            SS.exportPwlCurves ? CHECK_TRUE : CHECK_FALSE);
+            SS.exportPwlCurves ? CHECK_TRUE : CHECK_FALSE,
+            _("export curves as piecewise linear"));
     }
-    Printf(false, "  %Fd%f%Ll%s  fix white exported lines%E",
+    Printf(false, "  %Fd%f%Ll%s  %s%E",
         &ScreenChangeFixExportColors,
-        SS.fixExportColors ? CHECK_TRUE : CHECK_FALSE);
+        SS.fixExportColors ? CHECK_TRUE : CHECK_FALSE,
+        _("fix white exported lines"));
 
     Printf(false, "");
-    Printf(false, "%Ft export canvas size:  "
-                  "%f%Fd%Lf%s fixed%E  "
-                  "%f%Fd%Lt%s auto%E",
+    Printf(false, "%Ft %s%E", _("export canvas size"));
+    Printf(false, "  %Fd%f%Fd%Lf%s %s%E  "
+                  "%f%Fd%Lt%s %s%E",
         &ScreenChangeCanvasSizeAuto,
-        !SS.exportCanvasSizeAuto ? RADIO_TRUE : RADIO_FALSE,
+        !SS.exportCanvasSizeAuto ? RADIO_TRUE : RADIO_FALSE, _("fixed"),
         &ScreenChangeCanvasSizeAuto,
-        SS.exportCanvasSizeAuto ? RADIO_TRUE : RADIO_FALSE);
+        SS.exportCanvasSizeAuto ? RADIO_TRUE : RADIO_FALSE, _("auto"));
 
     if(SS.exportCanvasSizeAuto) {
-        Printf(false, "%Ft (by margins around exported geometry)");
-        Printf(false, "%Ba%Ft   left:   %Fd%s %Fl%Ll%f%D[change]%E",
-            SS.MmToString(SS.exportMargin.left).c_str(), &ScreenChangeCanvasSize, 0);
-        Printf(false, "%Bd%Ft   right:  %Fd%s %Fl%Ll%f%D[change]%E",
-            SS.MmToString(SS.exportMargin.right).c_str(), &ScreenChangeCanvasSize, 1);
-        Printf(false, "%Ba%Ft   bottom: %Fd%s %Fl%Ll%f%D[change]%E",
-            SS.MmToString(SS.exportMargin.bottom).c_str(), &ScreenChangeCanvasSize, 2);
-        Printf(false, "%Bd%Ft   top:    %Fd%s %Fl%Ll%f%D[change]%E",
-            SS.MmToString(SS.exportMargin.top).c_str(), &ScreenChangeCanvasSize, 3);
+        Printf(false, "%Ft %s", _("by margins around exported geometry"));
+        Printf(false, "%Ba%Ft   %S%Fd%S %Fl%Ll%f%D[%s]%E",
+        	_("left:"), -10,
+            SS.MmToString(SS.exportMargin.left).c_str(), 7, &ScreenChangeCanvasSize, 0,
+            _("change"));
+        Printf(false, "%Bd%Ft   %S%Fd%S %Fl%Ll%f%D[%s]%E",
+        	_("right:"), -10,
+            SS.MmToString(SS.exportMargin.right).c_str(), 7, &ScreenChangeCanvasSize, 1,
+            _("change"));
+        Printf(false, "%Ba%Ft   %S%Fd%S %Fl%Ll%f%D[%s]%E",
+        	_("bottom:"), -10,
+            SS.MmToString(SS.exportMargin.bottom).c_str(), 7, &ScreenChangeCanvasSize, 2,
+            _("change"));
+        Printf(false, "%Bd%Ft   %S%Fd%S %Fl%Ll%f%D[%s]%E",
+        	_("top:"), -10,
+            SS.MmToString(SS.exportMargin.top).c_str(), 7, &ScreenChangeCanvasSize, 3,
+            _("change"));
     } else {
-        Printf(false, "%Ft (by absolute dimensions and offsets)");
-        Printf(false, "%Ba%Ft   width:    %Fd%s %Fl%Ll%f%D[change]%E",
-            SS.MmToString(SS.exportCanvas.width).c_str(), &ScreenChangeCanvasSize, 10);
-        Printf(false, "%Bd%Ft   height:   %Fd%s %Fl%Ll%f%D[change]%E",
-            SS.MmToString(SS.exportCanvas.height).c_str(), &ScreenChangeCanvasSize, 11);
-        Printf(false, "%Ba%Ft   offset x: %Fd%s %Fl%Ll%f%D[change]%E",
-            SS.MmToString(SS.exportCanvas.dx).c_str(), &ScreenChangeCanvasSize, 12);
-        Printf(false, "%Bd%Ft   offset y: %Fd%s %Fl%Ll%f%D[change]%E",
-            SS.MmToString(SS.exportCanvas.dy).c_str(), &ScreenChangeCanvasSize, 13);
+        Printf(false, "%Ft %s", _("by absolute dimensions and offsets"));
+        Printf(false, "%Ba%Ft   %S%Fd%S %Fl%Ll%f%D[%s]%E",
+        	_("width:"), -12,
+            SS.MmToString(SS.exportCanvas.width).c_str(), 7, &ScreenChangeCanvasSize, 10,
+            _("change"));
+        Printf(false, "%Bd%Ft   %S%Fd%S %Fl%Ll%f%D[%s]%E",
+        	_("height:"), -12,
+            SS.MmToString(SS.exportCanvas.height).c_str(), 7, &ScreenChangeCanvasSize, 11,
+            _("change"));
+        Printf(false, "%Ba%Ft   %S%Fd%S %Fl%Ll%f%D[%s]%E",
+        	_("offset x:"), -12,
+            SS.MmToString(SS.exportCanvas.dx).c_str(), 7, &ScreenChangeCanvasSize, 12,
+            _("change"));
+        Printf(false, "%Bd%Ft   %S%Fd%S %Fl%Ll%f%D[%s]%E",
+        	_("offset y:"), -12,
+            SS.MmToString(SS.exportCanvas.dy).c_str(), 7, &ScreenChangeCanvasSize, 13,
+            _("change"));
     }
 
     Printf(false, "");
-    Printf(false, "%Ft exported g code parameters");
-    Printf(false, "%Ba%Ft   depth:     %Fd%s %Fl%Ld%f[change]%E",
-        SS.MmToString(SS.gCode.depth).c_str(), &ScreenChangeGCodeParameter);
-    Printf(false, "%Bd%Ft   passes:    %Fd%d %Fl%Ls%f[change]%E",
-        SS.gCode.passes, &ScreenChangeGCodeParameter);
-    Printf(false, "%Ba%Ft   feed:      %Fd%s %Fl%LF%f[change]%E",
-        SS.MmToString(SS.gCode.feed).c_str(), &ScreenChangeGCodeParameter);
-    Printf(false, "%Bd%Ft   plunge fd: %Fd%s %Fl%LP%f[change]%E",
-        SS.MmToString(SS.gCode.plungeFeed).c_str(), &ScreenChangeGCodeParameter);
+    Printf(false, "%Ft %s", _("exported g code parameters"));
+    Printf(false, "%Ba%Ft   %S%Fd%S %Fl%Ld%f[%s]%E",
+    	_("depth:"), -12,
+        SS.MmToString(SS.gCode.depth).c_str(), 7, &ScreenChangeGCodeParameter,
+        _("change"));
+    Printf(false, "%Bd%Ft   %S%Fd%S %Fl%Ls%f[%s]%E",
+    	_("passes:"), -12,
+        SS.MmToString(SS.gCode.passes).c_str(), 7, &ScreenChangeGCodeParameter,
+        _("change"));
+    Printf(false, "%Ba%Ft   %S%Fd%S %Fl%LF%f[%s]%E",
+    	_("feed:"), -12,
+        SS.MmToString(SS.gCode.feed).c_str(), 7, &ScreenChangeGCodeParameter,
+        _("change"));
+    Printf(false, "%Bd%Ft   %S%Fd%S %Fl%LP%f[%s]%E",
+    	_("plunge fd:"), -12,
+        SS.MmToString(SS.gCode.plungeFeed).c_str(), 7, &ScreenChangeGCodeParameter,
+        _("change"));
 
     Printf(false, "");
-    Printf(false, "  %Fd%f%Ll%s  draw triangle back faces in red%E",
+    Printf(false, "  %Fd%f%Ll%s  %s%E",
         &ScreenChangeBackFaces,
-        SS.drawBackFaces ? CHECK_TRUE : CHECK_FALSE);
-    Printf(false, "  %Fd%f%Ll%s  check sketch for closed contour%E",
+        SS.drawBackFaces ? CHECK_TRUE : CHECK_FALSE,
+        _("draw triangle back faces in red"));
+    Printf(false, "  %Fd%f%Ll%s  %s%E",
         &ScreenChangeCheckClosedContour,
-        SS.checkClosedContour ? CHECK_TRUE : CHECK_FALSE);
-    Printf(false, "  %Fd%f%Ll%s  show areas of closed contours%E",
+        SS.checkClosedContour ? CHECK_TRUE : CHECK_FALSE,
+        _("check sketch for closed contour"));
+    Printf(false, "  %Fd%f%Ll%s  %s%E",
         &ScreenChangeShowContourAreas,
-        SS.showContourAreas ? CHECK_TRUE : CHECK_FALSE);
+        SS.showContourAreas ? CHECK_TRUE : CHECK_FALSE,
+        _("show areas of closed contours"));
 
     Printf(false, "");
-    Printf(false, "%Ft autosave interval (in minutes)%E");
-    Printf(false, "%Ba   %d %Fl%Ll%f[change]%E",
-        SS.autosaveInterval, &ScreenChangeAutosaveInterval);
+    Printf(false, "%Ft %s%E", _("autosave interval (in minutes)"));
+    Printf(false, "%Ba   %d %Fl%Ll%f[%s]%E",
+        SS.autosaveInterval, &ScreenChangeAutosaveInterval, _("change"));
 
     if(canvas) {
         const char *gl_vendor, *gl_renderer, *gl_version;
         canvas->GetIdent(&gl_vendor, &gl_renderer, &gl_version);
         Printf(false, "");
-        Printf(false, " %Ftgl vendor   %E%s", gl_vendor);
-        Printf(false, " %Ft   renderer %E%s", gl_renderer);
-        Printf(false, " %Ft   version  %E%s", gl_version);
+        Printf(false, " %Ftgl %S %E%s", _("vendor"), -15, gl_vendor);
+        Printf(false, " %Ft   %S %E%s", _("renderer"), -15, gl_renderer);
+        Printf(false, " %Ft   %S %E%s", _("version"), -15, gl_version);
     }
 }
 

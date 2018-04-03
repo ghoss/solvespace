@@ -672,14 +672,21 @@ ExprParser::Token ExprParser::LexNumber(std::string *error) {
     std::string s;
 
     while(char c = PeekChar()) {
-        if(!((c >= '0' && c <= '9') || c == 'e' || c == 'E' || c == '.' || c == '_')) break;
+        if(!((c >= '0' && c <= '9') || c == 'e' || c == 'E'
+        	|| c == '.' || c == ',' || c == '_')) break;
+        	
         if(c == '_') {
             ReadChar();
             continue;
         }
-        s.push_back(ReadChar());
+        
+        // Convert foreign decimal separators to .
+        c = ReadChar();
+        if (c == ',') c = '.';
+        
+        s.push_back(c);
     }
-
+	
     char *endptr;
     double d = strtod(s.c_str(), &endptr);
 
@@ -688,7 +695,7 @@ ExprParser::Token ExprParser::LexNumber(std::string *error) {
         t = Token::From(TokenType::OPERAND, Expr::Op::CONSTANT);
         t.expr->v = d;
     } else {
-        *error = "'" + s + "' is not a valid number";
+        *error = "'" + s + "' " + _("is not a valid number");
     }
     return t;
 }
@@ -719,9 +726,9 @@ ExprParser::Token ExprParser::Lex(std::string *error) {
             t = Token::From(TokenType::OPERAND, Expr::Op::CONSTANT);
             t.expr->v = PI;
         } else {
-            *error = "'" + s + "' is not a valid variable, function or constant";
+            *error = "'" + s + "' " + _("is not a valid variable, function or constant");
         }
-    } else if(isdigit(c) || c == '.') {
+    } else if(isdigit(c) || c == '.' || c == ',') {
         return LexNumber(error);
     } else if(ispunct(c)) {
         ReadChar();
@@ -738,12 +745,12 @@ ExprParser::Token ExprParser::Lex(std::string *error) {
         } else if(c == ')') {
             t = Token::From(TokenType::PAREN_RIGHT);
         } else {
-            *error = "'" + std::string(1, c) + "' is not a valid operator";
+            *error = "'" + std::string(1, c) + "' " + _("is not a valid operator");
         }
     } else if(c == '\0') {
         t = Token::From(TokenType::END);
     } else {
-        *error = "Unexpected character '" + std::string(1, c) + "'";
+        *error = _("Unexpected character '") + std::string(1, c) + "'";
     }
 
     return t;
@@ -752,7 +759,7 @@ ExprParser::Token ExprParser::Lex(std::string *error) {
 ExprParser::Token ExprParser::PopOperand(std::string *error) {
     Token t = Token::From();
     if(stack.empty() || stack.back().type != TokenType::OPERAND) {
-        *error = "Expected an operand";
+        *error = _("Expected an operand");
     } else {
         t = stack.back();
         stack.pop_back();
@@ -764,7 +771,7 @@ ExprParser::Token ExprParser::PopOperator(std::string *error) {
     Token t = Token::From();
     if(stack.empty() || (stack.back().type != TokenType::UNARY_OP &&
                          stack.back().type != TokenType::BINARY_OP)) {
-        *error = "Expected an operator";
+        *error = _("Expected an operator");
     } else {
         t = stack.back();
         stack.pop_back();
@@ -776,7 +783,7 @@ int ExprParser::Precedence(Token t) {
     ssassert(t.type == TokenType::BINARY_OP ||
              t.type == TokenType::UNARY_OP ||
              t.type == TokenType::OPERAND,
-             "Unexpected token type");
+             _("Unexpected token type"));
 
     if(t.type == TokenType::UNARY_OP) {
         return 30;
@@ -788,7 +795,7 @@ int ExprParser::Precedence(Token t) {
         return 10;
     } else if(t.type == TokenType::OPERAND) {
         return 0;
-    } else ssassert(false, "Unexpected operator");
+    } else ssassert(false, _("Unexpected operator"));
 }
 
 bool ExprParser::Reduce(std::string *error) {
@@ -817,13 +824,13 @@ bool ExprParser::Reduce(std::string *error) {
                 case Expr::Op::COS:    e = e->Times(Expr::From(PI/180))->Cos(); break;
                 case Expr::Op::ASIN:   e = e->ASin()->Times(Expr::From(180/PI)); break;
                 case Expr::Op::ACOS:   e = e->ACos()->Times(Expr::From(180/PI)); break;
-                default: ssassert(false, "Unexpected unary operator");
+                default: ssassert(false, _("Unexpected unary operator"));
             }
             r.expr = e;
             break;
         }
 
-        default: ssassert(false, "Unexpected operator");
+        default: ssassert(false, _("Unexpected operator"));
     }
     stack.push_back(r);
 
@@ -853,7 +860,7 @@ bool ExprParser::Parse(std::string *error, size_t reduceUntil) {
                 if(!Parse(error, /*reduceUntil=*/stack.size())) return false;
 
                 if(stack.empty() || stack.back().type != TokenType::PAREN_RIGHT) {
-                    *error = "Expected ')'";
+                    *error = _("Expected ')'");
                     return false;
                 }
                 stack.pop_back();
@@ -910,7 +917,9 @@ Expr *Expr::From(const char *input, bool popUpError) {
     if(!e) {
         dbp("Parse/lex error: %s", error.c_str());
         if(popUpError) {
-            Error("Not a valid number or expression: '%s'.\n%s.", input, error.c_str());
+            Error("%s: '%s'.\n%s.", 
+            	_("Not a valid number or expression"),
+            	input, error.c_str());
         }
     }
     return e;

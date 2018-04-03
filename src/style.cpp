@@ -37,7 +37,8 @@ std::string Style::CnfTextHeight(const std::string &prefix) {
 }
 
 std::string Style::CnfPrefixToName(const std::string &prefix) {
-    std::string name = "#def-";
+    std::string name;
+    std::string s = "#def-";
 
     for(size_t i = 0; i < prefix.length(); i++) {
         if(isupper(prefix[i]) && i != 0)
@@ -45,7 +46,8 @@ std::string Style::CnfPrefixToName(const std::string &prefix) {
         name += tolower(prefix[i]);
     }
 
-    return name;
+	s.append(_(name.c_str()));
+    return s;
 }
 
 void Style::CreateAllDefaultStyles() {
@@ -74,7 +76,7 @@ void Style::CreateDefaultStyle(hStyle h) {
     if(isDefaultStyle) {
         ns.name = CnfPrefixToName(d->cnfPrefix);
     } else {
-        ns.name = "new-custom-style";
+        ns.name = _("new-custom-style");
     }
 
     SK.style.Add(&ns);
@@ -358,7 +360,7 @@ double Style::StippleScaleMm(hStyle hs) {
 
 std::string Style::DescriptionString() const {
     if(name.empty()) {
-        return ssprintf("s%03x-(unnamed)", h.v);
+        return ssprintf("s%03x-%s", h.v, _("(unnamed)"));
     } else {
         return ssprintf("s%03x-%s", h.v, name.c_str());
     }
@@ -389,7 +391,7 @@ void TextWindow::ScreenChangeBackgroundColor(int link, uint32_t v) {
 }
 
 void TextWindow::ShowListOfStyles() {
-    Printf(true, "%Ft color  style-name");
+    Printf(true, "%Ft%S%s", _("color"), -8, _("style-name"));
 
     bool darkbg = false;
     Style *s;
@@ -404,20 +406,20 @@ void TextWindow::ShowListOfStyles() {
         darkbg = !darkbg;
     }
 
-    Printf(true, "  %Fl%Ll%fcreate a new custom style%E",
-        &ScreenCreateCustomStyle);
+    Printf(true, "%Fl%Ll%f%s%E",
+        &ScreenCreateCustomStyle, _("create a new custom style"));
 
     Printf(false, "");
 
     RgbaColor rgb = SS.backgroundColor;
-    Printf(false, "%Ft background color (r, g, b)%E");
-    Printf(false, "%Ba   %@, %@, %@ %Fl%D%f%Ll[change]%E",
+    Printf(false, "%Ft %s (r, g, b)%E", _("background color"));
+    Printf(false, "%Ba   %@, %@, %@ %Fl%D%f%Ll[%s]%E",
         rgb.redF(), rgb.greenF(), rgb.blueF(),
-        top[rows-1] + 2, &ScreenChangeBackgroundColor);
+        top[rows-1] + 2, &ScreenChangeBackgroundColor, _("change"));
 
     Printf(false, "");
-    Printf(false, "  %Fl%Ll%fload factory defaults%E",
-        &ScreenLoadFactoryDefaultStyles);
+    Printf(false, "%Fl%Ll%f%s%E",
+        &ScreenLoadFactoryDefaultStyles, _("load factory defaults"));
 }
 
 
@@ -671,63 +673,70 @@ bool TextWindow::EditControlDoneForStyles(const char *str) {
 }
 
 void TextWindow::ShowStyleInfo() {
-    Printf(true, "%Fl%f%Ll(back to list of styles)%E", &ScreenShowListOfStyles);
+    Printf(true, "%Fl%f%Ll(%s)%E", &ScreenShowListOfStyles, _("back to list of styles"));
 
     Style *s = Style::Get(shown.style);
 
     if(s->h.v < Style::FIRST_CUSTOM) {
-        Printf(true, "%FtSTYLE  %E%s ", s->DescriptionString().c_str());
+        Printf(true, "%Ft%s %E%s ", _("STYLE"), s->DescriptionString().c_str());
     } else {
-        Printf(true, "%FtSTYLE  %E%s "
-                     "[%Fl%Ll%D%frename%E/%Fl%Ll%D%fdel%E]",
+        Printf(true, "%Ft%s %E%s "
+                     "[%Fl%Ll%D%f%s%E/%Fl%Ll%D%f%s%E]",
+            _("STYLE"),
             s->DescriptionString().c_str(),
-            s->h.v, &ScreenChangeStyleName,
-            s->h.v, &ScreenDeleteStyle);
+            s->h.v, &ScreenChangeStyleName, _("rename"),
+            s->h.v, &ScreenDeleteStyle, _("del"));
     }
-    Printf(true, "%Ft line stroke style%E");
-    Printf(false, "%Ba   %Ftcolor %E%Bz  %Ba (%@, %@, %@) %D%f%Ls%Fl[change]%E",
+    Printf(true, "%Ft%s%E", _("line stroke style"));
+    Printf(false, "%Ba   %s %E%Bz  %Ba (%@, %@, %@) %D%f%Ls%Fl[%s]%E",
+    	_("color"),
         &s->color,
         s->color.redF(), s->color.greenF(), s->color.blueF(),
-        s->h.v, ScreenChangeStyleColor);
+        s->h.v, ScreenChangeStyleColor, _("change"));
 
     // The line width, and its units
     if(s->widthAs == Style::UnitsAs::PIXELS) {
-        Printf(false, "   %Ftwidth%E %@ %D%f%Lp%Fl[change]%E",
+        Printf(false, "   %Ft%s%E %@ %D%f%Lp%Fl[%s]%E",
+        	_("width"),
             s->width,
             s->h.v, &ScreenChangeStyleMetric,
-            (s->h.v < Style::FIRST_CUSTOM) ? 'w' : 'W');
+            (s->h.v < Style::FIRST_CUSTOM) ? 'w' : 'W', _("change"));
     } else {
-        Printf(false, "   %Ftwidth%E %s %D%f%Lp%Fl[change]%E",
+        Printf(false, "   %Ft%s%E %s %D%f%Lp%Fl[%s]%E",
+        	_("width"),
             SS.MmToString(s->width).c_str(),
             s->h.v, &ScreenChangeStyleMetric,
-            (s->h.v < Style::FIRST_CUSTOM) ? 'w' : 'W');
+            (s->h.v < Style::FIRST_CUSTOM) ? 'w' : 'W', _("change"));
     }
 
     if(s->widthAs == Style::UnitsAs::PIXELS) {
-        Printf(false, "%Ba   %Ftstipple width%E %@ %D%f%Lp%Fl[change]%E",
+        Printf(false, "%Ba   %Ft%s%E %@ %D%f%Lp%Fl[%s]%E",
+        	_("stipple width"),
             s->stippleScale,
-            s->h.v, &ScreenChangeStyleMetric, 's');
+            s->h.v, &ScreenChangeStyleMetric, 's', _("change"));
     } else {
-        Printf(false, "%Ba   %Ftstipple width%E %s %D%f%Lp%Fl[change]%E",
+        Printf(false, "%Ba   %Ft%s%E %s %D%f%Lp%Fl[%s]%E",
+        	_("stipple width"),
             SS.MmToString(s->stippleScale).c_str(),
-            s->h.v, &ScreenChangeStyleMetric, 's');
+            s->h.v, &ScreenChangeStyleMetric, 's', _("change"));
     }
 
     bool widthpx = (s->widthAs == Style::UnitsAs::PIXELS);
     if(s->h.v < Style::FIRST_CUSTOM) {
-        Printf(false,"   %Ftin units of %Fdpixels%E");
+        Printf(false,"   %Ft%s %Fd%s%E", _("in units of"), _("pixels"));
     } else {
-        Printf(false,"%Ba   %Ftin units of  %Fd"
-                            "%D%f%LW%s pixels%E  "
+        Printf(false,"%Ba   %Ft%s %Fd"
+                            "%D%f%LW%s %s%E  "
                             "%D%f%Lw%s %s",
+            _("in units of"),
             s->h.v, &ScreenChangeStyleYesNo,
-            widthpx ? RADIO_TRUE : RADIO_FALSE,
+            widthpx ? RADIO_TRUE : RADIO_FALSE, _("pixels"),
             s->h.v, &ScreenChangeStyleYesNo,
             !widthpx ? RADIO_TRUE : RADIO_FALSE,
             SS.UnitName());
     }
 
-    Printf(false,"%Ba   %Ftstipple type:%E");
+    Printf(false,"%Ba   %Ft%s:%E", _("stipple type"));
 
     const size_t patternCount = (size_t)StipplePattern::LAST + 1;
     const char *patternsSource[patternCount] = {
@@ -769,29 +778,32 @@ void TextWindow::ShowStyleInfo() {
         // The fill color, and whether contours are filled
 
         Printf(false, "");
-        Printf(false, "%Ft contour fill style%E");
+        Printf(false, "%Ft%s%E", _("contour fill style"));
         Printf(false,
-            "%Ba   %Ftcolor %E%Bz  %Ba (%@, %@, %@) %D%f%Lf%Fl[change]%E",
+            "%Ba   %Ftcolor %E%Bz  %Ba (%@, %@, %@) %D%f%Lf%Fl[%s]%E",
             &s->fillColor,
             s->fillColor.redF(), s->fillColor.greenF(), s->fillColor.blueF(),
-            s->h.v, ScreenChangeStyleColor);
+            s->h.v, ScreenChangeStyleColor, _("change"));
 
-        Printf(false, "%Bd   %D%f%Lf%s  contours are filled%E",
+        Printf(false, "%Bd   %D%f%Lf%s  %s%E",
             s->h.v, &ScreenChangeStyleYesNo,
-            s->filled ? CHECK_TRUE : CHECK_FALSE);
+            s->filled ? CHECK_TRUE : CHECK_FALSE,
+            _("contours are filled"));
     }
 
     // The text height, and its units
     Printf(false, "");
-    Printf(false, "%Ft text style%E");
+    Printf(false, "%Ft %s%E", _("text style"));
 
     if(s->textHeightAs == Style::UnitsAs::PIXELS) {
-        Printf(false, "%Ba   %Ftheight %E%@ %D%f%Lt%Fl%s%E",
+        Printf(false, "%Ba   %Ft%s %E%@ %D%f%Lt%Fl%s%E",
+        	_("height"),
             s->textHeight,
             s->h.v, &ScreenChangeStyleMetric,
             "[change]");
     } else {
-        Printf(false, "%Ba   %Ftheight %E%s %D%f%Lt%Fl%s%E",
+        Printf(false, "%Ba   %Ft%s %E%s %D%f%Lt%Fl%s%E",
+        	_("height"),
             SS.MmToString(s->textHeight).c_str(),
             s->h.v, &ScreenChangeStyleMetric,
             "[change]");
@@ -799,65 +811,69 @@ void TextWindow::ShowStyleInfo() {
 
     bool textHeightpx = (s->textHeightAs == Style::UnitsAs::PIXELS);
     if(s->h.v < Style::FIRST_CUSTOM) {
-        Printf(false,"%Bd   %Ftin units of %Fdpixels");
+        Printf(false,"%Bd   %Ft%s %Fd%s", _("in units of"), _("pixels"));
     } else {
-        Printf(false,"%Bd   %Ftin units of  %Fd"
-                            "%D%f%LG%s pixels%E  "
+        Printf(false,"%Bd   %Ft%s %Fd"
+                            "%D%f%LG%s %s%E  "
                             "%D%f%Lg%s %s",
+            _("in units of"),
             s->h.v, &ScreenChangeStyleYesNo,
-            textHeightpx ? RADIO_TRUE : RADIO_FALSE,
+            textHeightpx ? RADIO_TRUE : RADIO_FALSE, _("pixels"),
             s->h.v, &ScreenChangeStyleYesNo,
             !textHeightpx ? RADIO_TRUE : RADIO_FALSE,
             SS.UnitName());
     }
 
     if(s->h.v >= Style::FIRST_CUSTOM) {
-        Printf(false, "%Ba   %Ftangle %E%@ %D%f%Ll%Fl[change]%E",
+        Printf(false, "%Ba   %Ft%s %E%@ %D%f%Ll%Fl[%s]%E",
+        	_("angle"),
             s->textAngle,
-            s->h.v, &ScreenChangeStyleTextAngle);
+            s->h.v, &ScreenChangeStyleTextAngle, _("change"));
 
         Printf(false, "");
-        Printf(false, "%Ft text comment alignment%E");
+        Printf(false, "%Ft %s%E", _("alignment"));
         bool neither;
         neither = !((uint32_t)s->textOrigin & ((uint32_t)Style::TextOrigin::LEFT | (uint32_t)Style::TextOrigin::RIGHT));
         Printf(false, "%Ba   "
-                      "%D%f%LL%s left%E    "
-                      "%D%f%LH%s center%E  "
-                      "%D%f%LR%s right%E  ",
+                      "%D%f%LL%s %s%E    "
+                      "%D%f%LH%s %s%E  "
+                      "%D%f%LR%s %s%E  ",
             s->h.v, &ScreenChangeStyleYesNo,
-            ((uint32_t)s->textOrigin & (uint32_t)Style::TextOrigin::LEFT) ? RADIO_TRUE : RADIO_FALSE,
+            ((uint32_t)s->textOrigin & (uint32_t)Style::TextOrigin::LEFT) ? RADIO_TRUE : RADIO_FALSE, _("left"),
             s->h.v, &ScreenChangeStyleYesNo,
-            neither ? RADIO_TRUE : RADIO_FALSE,
+            neither ? RADIO_TRUE : RADIO_FALSE, _("centered"),
             s->h.v, &ScreenChangeStyleYesNo,
-            ((uint32_t)s->textOrigin & (uint32_t)Style::TextOrigin::RIGHT) ? RADIO_TRUE : RADIO_FALSE);
+            ((uint32_t)s->textOrigin & (uint32_t)Style::TextOrigin::RIGHT) ? RADIO_TRUE : RADIO_FALSE, _("right"));
 
         neither = !((uint32_t)s->textOrigin & ((uint32_t)Style::TextOrigin::BOT | (uint32_t)Style::TextOrigin::TOP));
         Printf(false, "%Bd   "
-                      "%D%f%LB%s bottom%E  "
-                      "%D%f%LV%s center%E  "
-                      "%D%f%LT%s top%E  ",
+                      "%D%f%LB%s %s%E  "
+                      "%D%f%LV%s %s%E  "
+                      "%D%f%LT%s %s%E  ",
             s->h.v, &ScreenChangeStyleYesNo,
-            ((uint32_t)s->textOrigin & (uint32_t)Style::TextOrigin::BOT) ? RADIO_TRUE : RADIO_FALSE,
+            ((uint32_t)s->textOrigin & (uint32_t)Style::TextOrigin::BOT) ? RADIO_TRUE : RADIO_FALSE, _("bottom"),
             s->h.v, &ScreenChangeStyleYesNo,
-            neither ? RADIO_TRUE : RADIO_FALSE,
+            neither ? RADIO_TRUE : RADIO_FALSE, _("centered"),
             s->h.v, &ScreenChangeStyleYesNo,
-            ((uint32_t)s->textOrigin & (uint32_t)Style::TextOrigin::TOP) ? RADIO_TRUE : RADIO_FALSE);
+            ((uint32_t)s->textOrigin & (uint32_t)Style::TextOrigin::TOP) ? RADIO_TRUE : RADIO_FALSE, _("top"));
     }
 
     if(s->h.v >= Style::FIRST_CUSTOM) {
         Printf(false, "");
 
-        Printf(false, "  %Fd%D%f%Lv%s  show these objects on screen%E",
+        Printf(false, "  %Fd%D%f%Lv%s  %s%E",
                 s->h.v, &ScreenChangeStyleYesNo,
-                s->visible ? CHECK_TRUE : CHECK_FALSE);
+                s->visible ? CHECK_TRUE : CHECK_FALSE,
+                _("show these objects on screen"));
 
-        Printf(false, "  %Fd%D%f%Le%s  export these objects%E",
+        Printf(false, "  %Fd%D%f%Le%s  %s%E",
                 s->h.v, &ScreenChangeStyleYesNo,
-                s->exportable ? CHECK_TRUE : CHECK_FALSE);
+                s->exportable ? CHECK_TRUE : CHECK_FALSE,
+                _("export these objects"));
 
         Printf(false, "");
-        Printf(false, "To assign lines or curves to this style,");
-        Printf(false, "right-click them on the drawing.");
+        Printf(false, "%s", _("To assign lines or curves to this style,"));
+        Printf(false, "%s", _("right-click them on the drawing."));
     }
 }
 

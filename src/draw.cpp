@@ -794,7 +794,7 @@ void GraphicsWindow::Draw(Canvas *canvas) {
             u = camera.projRight;
             v = camera.projUp;
         }
-        canvas->DrawVectorText("previewing exported geometry; press Esc to return",
+        canvas->DrawVectorText(_("previewing exported geometry; press Esc to return"),
                               Style::DefaultTextHeight() / camera.scale,
                               p.Plus(u.ScaledBy(10/scale)).Plus(v.ScaledBy(10/scale)), u, v,
                               hcsDatum);
@@ -806,7 +806,7 @@ void GraphicsWindow::Draw(Canvas *canvas) {
                    vp = p.Plus(v.WithMagnitude(30/scale));
             canvas->DrawLine(um, up, hcsDatum);
             canvas->DrawLine(vm, vp, hcsDatum);
-            canvas->DrawVectorText("(x, y) = (0, 0) for file just exported",
+            canvas->DrawVectorText(_("(x, y) = (0, 0) for file just exported"),
                                   Style::DefaultTextHeight() / camera.scale,
                                   p.Plus(u.ScaledBy(40/scale)).Plus(
                                          v.ScaledBy(-(Style::DefaultTextHeight())/scale)), u, v,
@@ -874,7 +874,7 @@ void GraphicsWindow::Paint() {
     if(!SS.screenshotFile.IsEmpty()) {
         FILE *f = OpenFile(SS.screenshotFile, "wb");
         if(!f || !canvas->ReadFrame()->WritePng(f, /*flip=*/true)) {
-            Error("Couldn't write to '%s'", SS.screenshotFile.raw.c_str());
+            Error(_("Couldn't write to '%s'"), SS.screenshotFile.raw.c_str());
         }
         if(f) fclose(f);
         SS.screenshotFile.Clear();
@@ -894,10 +894,11 @@ void GraphicsWindow::Paint() {
     } else {
         renderTimeColor = { 255, 255, 255, 255 };
     }
-    uiCanvas.DrawBitmapText(ssprintf("rendered in %ld ms (%ld 1/s)",
-                                     (long)renderTime.count(),
-                                     (long)(1000/renderTime.count())),
-                            5, 5, renderTimeColor);
+    uiCanvas.DrawBitmapText(ssprintf(_("%s %ld ms (%ld 1/s)"),
+    	_("rendered in"),
+		(long)renderTime.count(),
+		(long)(1000/renderTime.count())),
+		5, 5, renderTimeColor);
 
     canvas->FlushFrame();
     canvas->Clear();

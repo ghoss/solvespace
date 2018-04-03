@@ -41,7 +41,7 @@ hGroup SolveSpaceUI::CreateDefaultDrawingGroup() {
 
     // And an empty group, for the first stuff the user draws.
     g.visible = true;
-    g.name = C_("group-name", "sketch-in-plane");
+    g.name = C_("group-name", _("sketch-in-plane"));
     g.type = Group::Type::DRAWING_WORKPLANE;
     g.subtype = Group::Subtype::WORKPLANE_BY_POINT_ORTHO;
     g.order = 1;
@@ -59,7 +59,7 @@ void SolveSpaceUI::NewFile() {
     // Our initial group, that contains the references.
     Group g = {};
     g.visible = true;
-    g.name = C_("group-name", "#references");
+    g.name = C_("group-name", _("#references"));
     g.type = Group::Type::DRAWING_3D;
     g.order = 0;
     g.h = Group::HGROUP_REFERENCES;
@@ -282,15 +282,15 @@ bool SolveSpaceUI::SaveToFile(const Platform::Path &filename) {
         if(g.type != Group::Type::LINKED) continue;
 
         if(g.linkFile.RelativeTo(filename).IsEmpty()) {
-            Error("This sketch links the sketch '%s'; it can only be saved "
-                  "on the same volume.", g.linkFile.raw.c_str());
+            Error(_("This sketch links the sketch '%s'; it can only be saved "
+                  "on the same volume."), g.linkFile.raw.c_str());
             return false;
         }
     }
 
     fh = OpenFile(filename, "wb");
     if(!fh) {
-        Error("Couldn't write to file '%s'", filename.raw.c_str());
+        Error(_("Couldn't write to '%s'"), filename.raw.c_str());
         return false;
     }
 
@@ -463,7 +463,7 @@ bool SolveSpaceUI::LoadFromFile(const Platform::Path &filename, bool canCancel) 
 
     fh = OpenFile(filename, "rb");
     if(!fh) {
-        Error("Couldn't read from file '%s'", filename.raw.c_str());
+        Error(_("Couldn't read from '%s'"), filename.raw.c_str());
         return false;
     }
 
@@ -923,7 +923,7 @@ bool SolveSpaceUI::ReloadLinkedImage(const Platform::Path &saveFile,
         if(GetOpenFile(filename, "", RasterFileFilter)) {
             pixmap = Pixmap::ReadPng(*filename);
             if(pixmap == NULL) {
-                Error("The image '%s' is corrupted.", filename->raw.c_str());
+                Error(_("The image '%s' is corrupted."), filename->raw.c_str());
             }
             // We know where the file is now, good.
         } else if(canCancel) {

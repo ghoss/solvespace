@@ -42,7 +42,10 @@ public:
             : variable(variable), tooltip(tooltip), iconName(iconName) {}
 
     std::string Tooltip() override {
-        return ((*variable) ? "Hide " : "Show ") + tooltip;
+    	std::string s;
+    	s.append((*variable) ? _("Hide ") : _("Show "));
+    	s.append(_(tooltip.c_str()));
+        return s;
     }
 
     void Draw(UiCanvas *uiCanvas, int x, int y, bool asHovered) override {
@@ -76,9 +79,9 @@ public:
 
     std::string Tooltip() override {
         if(*variable) {
-            return "Don't make faces selectable with mouse";
+            return _("Don't make faces selectable with mouse");
         } else {
-            return "Make faces selectable with mouse";
+            return _("Make faces selectable with mouse");
         }
     }
 };
@@ -92,13 +95,13 @@ public:
     std::string Tooltip() override {
         switch(SS.GW.drawOccludedAs) {
             case GraphicsWindow::DrawOccludedAs::INVISIBLE:
-                return "Stipple occluded lines";
+                return _("Stipple occluded lines");
 
             case GraphicsWindow::DrawOccludedAs::STIPPLED:
-                return "Draw occluded lines";
+                return _("Draw occluded lines");
 
             case GraphicsWindow::DrawOccludedAs::VISIBLE:
-                return "Don't draw occluded lines";
+                return _("Don't draw occluded lines");
 
             default: ssassert(false, "Unexpected mode");
         }
@@ -156,22 +159,22 @@ public:
 static SpacerButton   spacerButton;
 
 static ShowHideButton workplanesButton =
-    { &(SS.GW.showWorkplanes),  "workplane",     "workplanes from inactive groups" };
+    { &(SS.GW.showWorkplanes), "workplane", _("workplanes from inactive groups") };
 static ShowHideButton normalsButton =
-    { &(SS.GW.showNormals),     "normal",        "normals"                         };
+    { &(SS.GW.showNormals), "normal", _("normals") };
 static ShowHideButton pointsButton =
-    { &(SS.GW.showPoints),      "point",         "points"                          };
+    { &(SS.GW.showPoints), "point", _("points") };
 static ShowHideButton constraintsButton =
-    { &(SS.GW.showConstraints), "constraint",    "constraints and dimensions"      };
+    { &(SS.GW.showConstraints), "constraint", _("constraints and dimensions") };
 static FacesButton facesButton;
 static ShowHideButton shadedButton =
-    { &(SS.GW.showShaded),      "shaded",        "shaded view of solid model"      };
+    { &(SS.GW.showShaded), "shaded", _("shaded view of solid model") };
 static ShowHideButton edgesButton =
-    { &(SS.GW.showEdges),       "edges",         "edges of solid model"            };
+    { &(SS.GW.showEdges), "edges", _("edges of solid model") };
 static ShowHideButton outlinesButton =
-    { &(SS.GW.showOutlines),    "outlines",      "outline of solid model"          };
+    { &(SS.GW.showOutlines), "outlines", _("outline of solid model") };
 static ShowHideButton meshButton =
-    { &(SS.GW.showMesh),        "mesh",          "triangle mesh of solid model"    };
+    { &(SS.GW.showMesh), "mesh", _("triangle mesh of solid model") };
 static OccludedLinesButton occludedLinesButton;
 
 static Button *buttons[] = {
@@ -360,6 +363,15 @@ void TextWindow::Printf(bool halfLine, const char *fmt, ...) {
                     memcpy(buf, s, min(sizeof(buf), strlen(s)+1));
                     break;
                 }
+                case 'S': {
+                	// String with padding
+                	char buf1[1024];
+                    char *s = va_arg(vl, char *);
+                    int v = va_arg(vl, int);
+                    sprintf(buf1, "%%%ds", v);
+                    snprintf(buf, 1024, buf1, s);
+                    break;
+                }                
                 case 'c': {
                     // 'char' is promoted to 'int' when passed through '...'
                     int v = va_arg(vl, int);
@@ -473,8 +485,8 @@ void TextWindow::Show() {
         ShowHeader(false);
         Printf(false, "");
         Printf(false, "%s", SS.GW.pending.description);
-        Printf(true, "%Fl%f%Ll(cancel operation)%E",
-            &TextWindow::ScreenUnselectAll);
+        Printf(true, "%Fl%f%Ll(%s)%E",
+            &TextWindow::ScreenUnselectAll, _("cancel operation"));
     } else if((gs.n > 0 || gs.constraints > 0) &&
                                     shown.screen != Screen::PASTE_TRANSFORMED)
     {

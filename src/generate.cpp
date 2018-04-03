@@ -340,17 +340,22 @@ void SolveSpaceUI::GenerateAll(Generate type, bool andFindFree, bool genForBBox)
             // pruned any orphaned etc. objects, and the message loop for the
             // messagebox could allow us to repaint and crash. But now we must
             // be fine.
-            Message("Additional sketch elements were deleted, because they "
-                    "depend on the element that was just deleted explicitly. "
-                    "These include: \n"
-                    "     %d request%s\n"
-                    "     %d constraint%s\n"
-                    "     %d group%s"
+            Message("%s: \n"
+                    "     %d %s\n"
+                    "     %d %s\n"
+                    "     %d %s"
                     "%s",
-                       deleted.requests, deleted.requests == 1 ? "" : "s",
-                       deleted.constraints, deleted.constraints == 1 ? "" : "s",
-                       deleted.groups, deleted.groups == 1 ? "" : "s",
-                       undo.cnt > 0 ? "\n\nChoose Edit -> Undo to undelete all elements." : "");
+                    "Additional sketch elements were deleted, because they "
+                    "depend on the element that was just deleted explicitly. "
+                    "These include",
+                       deleted.requests, deleted.requests == 1 ? 
+            				_("request") : _("requests"),
+                       deleted.constraints, deleted.constraints == 1 ? 
+                       		_("constraint") : _("constraints"),
+                       deleted.groups, deleted.groups == 1 ? 
+                       		_("group") : _("groups"),
+                       undo.cnt > 0 ?
+                       		_("\n\nChoose Edit -> Undo to undelete all elements.") : "");
         }
 
         deleted = {};

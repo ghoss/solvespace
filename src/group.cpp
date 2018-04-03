@@ -87,12 +87,12 @@ void Group::MenuGroup(Command id) {
     switch(id) {
         case Command::GROUP_3D:
             g.type = Type::DRAWING_3D;
-            g.name = C_("group-name", "sketch-in-3d");
+            g.name = C_("group-name", _("sketch-in-3d"));
             break;
 
         case Command::GROUP_WRKPL:
             g.type = Type::DRAWING_WORKPLANE;
-            g.name = C_("group-name", "sketch-in-plane");
+            g.name = C_("group-name", _("sketch-in-plane"));
             if(gs.points == 1 && gs.n == 1) {
                 g.subtype = Subtype::WORKPLANE_BY_POINT_ORTHO;
 
@@ -164,7 +164,7 @@ void Group::MenuGroup(Command id) {
             g.opA = SS.GW.activeGroup;
             g.predef.entityB = SS.GW.ActiveWorkplane();
             g.subtype = Subtype::ONE_SIDED;
-            g.name = C_("group-name", "extrude");
+            g.name = C_("group-name", _("extrude"));
             break;
 
         case Command::GROUP_LATHE:
@@ -186,7 +186,7 @@ void Group::MenuGroup(Command id) {
             }
             g.type = Type::LATHE;
             g.opA = SS.GW.activeGroup;
-            g.name = C_("group-name", "lathe");
+            g.name = C_("group-name", _("lathe"));
             break;
 
         case Command::GROUP_ROT: {
@@ -212,7 +212,7 @@ void Group::MenuGroup(Command id) {
             g.opA = SS.GW.activeGroup;
             g.valA = 3;
             g.subtype = Subtype::ONE_SIDED;
-            g.name = C_("group-name", "rotate");
+            g.name = C_("group-name", _("rotate"));
             break;
         }
 
@@ -223,7 +223,7 @@ void Group::MenuGroup(Command id) {
             g.subtype = Subtype::ONE_SIDED;
             g.predef.entityB = SS.GW.ActiveWorkplane();
             g.activeWorkplane = SS.GW.ActiveWorkplane();
-            g.name = C_("group-name", "translate");
+            g.name = C_("group-name", _("translate"));
             break;
 
         case Command::GROUP_LINK: {

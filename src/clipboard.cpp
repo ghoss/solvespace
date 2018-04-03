@@ -448,29 +448,38 @@ void TextWindow::ScreenPasteTransformed(int link, uint32_t v) {
 }
 
 void TextWindow::ShowPasteTransformed() {
-    Printf(true, "%FtPASTE TRANSFORMED%E");
-    Printf(true,  "%Ba   %Ftrepeat%E    %d time%s %Fl%Lt%f[change]%E",
-        shown.paste.times, (shown.paste.times == 1) ? "" : "s",
-        &ScreenChangePasteTransformed);
-    Printf(false, "%Bd   %Ftrotate%E    %@ degrees %Fl%Lr%f[change]%E",
+    Printf(true, "%Ft%s%E", _("PASTE TRANSFORMED"));
+    Printf(true,  "%Ba   %Ft%s%E    %d %s %Fl%Lt%f[%s]%E",
+    	_("repeat"),
+        shown.paste.times, (shown.paste.times == 1) ? _("time") : _("times"),
+        &ScreenChangePasteTransformed,
+        _("change"));
+    Printf(false, "%Bd   %Ft%s%E    %@ %s %Fl%Lr%f[%s]%E",
+    	_("rotate"), _("degrees"),
         shown.paste.theta*180/PI,
-        &ScreenChangePasteTransformed);
-    Printf(false, "%Ba   %Ftabout pt%E  (%s, %s, %s) %Fl%Lo%f[use selected]%E",
-            SS.MmToString(shown.paste.origin.x).c_str(),
-            SS.MmToString(shown.paste.origin.y).c_str(),
-            SS.MmToString(shown.paste.origin.z).c_str(),
-        &ScreenPasteTransformed);
-    Printf(false, "%Bd   %Fttranslate%E (%s, %s, %s) %Fl%Lt%f[use selected]%E",
-            SS.MmToString(shown.paste.trans.x).c_str(),
-            SS.MmToString(shown.paste.trans.y).c_str(),
-            SS.MmToString(shown.paste.trans.z).c_str(),
-        &ScreenPasteTransformed);
-    Printf(false, "%Ba   %Ftscale%E     %@ %Fl%Ls%f[change]%E",
+        &ScreenChangePasteTransformed,
+        _("change"));
+    Printf(false, "%Ba   %Ft%s%E  (%s, %s, %s) %Fl%Lo%f[%s]%E",
+    	_("about pt"),
+		SS.MmToString(shown.paste.origin.x).c_str(),
+		SS.MmToString(shown.paste.origin.y).c_str(),
+		SS.MmToString(shown.paste.origin.z).c_str(),
+        &ScreenPasteTransformed,
+		_("use selected"));
+    Printf(false, "%Bd   %Ft%s%E (%s, %s, %s) %Fl%Lt%f[%s]%E",
+    	_("translate"),
+		SS.MmToString(shown.paste.trans.x).c_str(),
+		SS.MmToString(shown.paste.trans.y).c_str(),
+		SS.MmToString(shown.paste.trans.z).c_str(),
+        &ScreenPasteTransformed,
+        _("use selected"));
+    Printf(false, "%Ba   %Ft%s%E     %@ %Fl%Ls%f[%s]%E",
+    	_("scale"),
         shown.paste.scale,
-        &ScreenChangePasteTransformed);
+        &ScreenChangePasteTransformed,
+		_("change"));
 
-    Printf(true, " %Fl%Lg%fpaste transformed now%E", &ScreenPasteTransformed);
-
-    Printf(true, "(or %Fl%Ll%fcancel operation%E)", &ScreenHome);
+    Printf(true, " %Fl%Lg%f%s%E", &ScreenPasteTransformed, _("paste transformed now"));
+    Printf(true, "(%s %Fl%Ll%f%s%E)", _("or"), &ScreenHome, _("cancel operation"));
 }
 

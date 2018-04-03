@@ -1074,7 +1074,7 @@ static void ImportDwgDxf(const Platform::Path &filename,
 
     std::string data;
     if(!ReadFile(filename, &data)) {
-        Error("Couldn't read from '%s'", filename.raw.c_str());
+        Error(_("Couldn't read from '%s'"), filename.raw.c_str());
         return;
     }
 
@@ -1083,8 +1083,8 @@ static void ImportDwgDxf(const Platform::Path &filename,
         DxfCheck3D checker = {};
         read(data, &checker);
         if(checker.is3d) {
-            Message("This %s file contains entities with non-zero Z coordinate; "
-                    "the entire file will be imported as construction entities in 3d.",
+            Message(_("This %s file contains entities with non-zero Z coordinate; "
+                    "the entire file will be imported as construction entities in 3d."),
                     fileType.c_str());
             SS.GW.SetWorkplaneFreeIn3d();
             SS.GW.EnsureValidActives();
@@ -1099,10 +1099,10 @@ static void ImportDwgDxf(const Platform::Path &filename,
     importer.asConstruction = asConstruction;
     importer.clearBlockTransform();
     if(!read(data, &importer)) {
-        Error("Corrupted %s file.", fileType.c_str());
+        Error(_("Corrupted %s file."), fileType.c_str());
     }
     if(importer.unknownEntities > 0) {
-        Message("%u %s entities of unknown type were ignored.",
+        Message(_("%u %s entities of unknown type were ignored."),
                 importer.unknownEntities, fileType.c_str());
     }
 }

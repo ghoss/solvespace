@@ -19,17 +19,17 @@ void TextWindow::ShowHeader(bool withNav) {
     const char *header;
     std::string desc;
     if(SS.GW.LockedInWorkplane()) {
-        header = "in plane: ";
+        header = _("in plane: ");
         desc = SK.GetEntity(SS.GW.ActiveWorkplane())->DescriptionString();
     } else {
-        header = "drawing / constraining in 3d";
+        header = _("drawing / constraining in 3d");
         desc = "";
     }
 
     // Navigation buttons
     if(withNav) {
-        Printf(false, " %Fl%Lh%fhome%E   %Ft%s%E%s",
-            (&TextWindow::ScreenHome), header, desc.c_str());
+        Printf(false, " %Fl%Lh%f%s%E   %Ft%s%E%s",
+            (&TextWindow::ScreenHome), _("home"), header, desc.c_str());
     } else {
         Printf(false, "        %Ft%s%E%s", header, desc.c_str());
     }
@@ -96,8 +96,8 @@ void TextWindow::ShowListOfGroups() {
                *checkTrue  = " " CHECK_TRUE  " ",
                *checkFalse = " " CHECK_FALSE " ";
 
-    Printf(true, "%Ft active");
-    Printf(false, "%Ft    shown ok  group-name%E");
+    Printf(true, "%Ft %S", _("active"), -10);
+    Printf(false, "%Ft      %S%S%S%E", _("shown"), -10, _("ok"), -7, _("group-name"), -10);
     int i;
     bool afterActive = false;
     for(i = 0; i < SK.groupOrder.n; i++) {
@@ -109,8 +109,8 @@ void TextWindow::ShowListOfGroups() {
         bool ref = (g->h.v == Group::HGROUP_REFERENCES.v);
         Printf(false, "%Bp%Fd "
                "%Ft%s%Fb%D%f%Ll%s%E "
-               "%Fb%s%D%f%Ll%s%E  "
-               "%Fp%D%f%s%Ll%s%E  "
+               "%Fb%s%D%f%Ll  %s%E  "
+               "%Fp%D%f    %S%Ll%S%E  "
                "%Fl%Ll%D%f%s",
             // Alternate between light and dark backgrounds, for readability
                 (i & 1) ? 'd' : 'a',
@@ -124,23 +124,23 @@ void TextWindow::ShowListOfGroups() {
                 afterActive ? "" : (shown ? checkTrue : checkFalse),
             // Link to the errors, if a problem occured while solving
             ok ? 's' : 'x', g->h.v, (&TextWindow::ScreenHowGroupSolved),
-                ok ? "ok" : "",
-                ok ? "" : "NO",
+                ok ? _("ok") : "", ok ? -5 : 0,
+                ok ? "" : _("NO"), ok ? 0 : -5,
             // Link to a screen that gives more details on the group
             g->h.v, (&TextWindow::ScreenSelectGroup), s.c_str());
 
         if(active) afterActive = true;
     }
 
-    Printf(true,  "  %Fl%Ls%fshow all%E / %Fl%Lh%fhide all%E",
-        &(TextWindow::ScreenShowGroupsSpecial),
-        &(TextWindow::ScreenShowGroupsSpecial));
-    Printf(true,  "  %Fl%Ls%fline styles%E /"
-                   " %Fl%Ls%fview%E /"
-                   " %Fl%Ls%fconfiguration%E",
-        &(TextWindow::ScreenShowListOfStyles),
-        &(TextWindow::ScreenShowEditView),
-        &(TextWindow::ScreenShowConfiguration));
+    Printf(true,  "  %Fl%Ls%f%s%E / %Fl%Lh%f%s%E",
+        &(TextWindow::ScreenShowGroupsSpecial), _("show all"),
+        &(TextWindow::ScreenShowGroupsSpecial), _("hide all"));
+    Printf(true,  "  %Fl%Ls%f%s%E /"
+                   " %Fl%Ls%f%s%E /"
+                   " %Fl%Ls%f%s%E",
+        &(TextWindow::ScreenShowListOfStyles), _("line styles"),
+        &(TextWindow::ScreenShowEditView), _("view"),
+        &(TextWindow::ScreenShowConfiguration), _("configuration"));
 }
 
 
@@ -277,71 +277,74 @@ void TextWindow::ShowGroupInfo() {
     const char *s = "???";
 
     if(shown.group.v == Group::HGROUP_REFERENCES.v) {
-        Printf(true, "%FtGROUP  %E%s", g->DescriptionString().c_str());
+        Printf(true, "%Ft%s  %E%s", _("GROUP"), g->DescriptionString().c_str());
         goto list_items;
     } else {
-        Printf(true, "%FtGROUP  %E%s [%Fl%Ll%D%frename%E/%Fl%Ll%D%fdel%E]",
+        Printf(true, "%Ft%s  %E%s [%Fl%Ll%D%f%s%E/%Fl%Ll%D%f%s%E]",
+            _("GROUP"),
             g->DescriptionString().c_str(),
-            g->h.v, &TextWindow::ScreenChangeGroupName,
-            g->h.v, &TextWindow::ScreenDeleteGroup);
+            g->h.v, &TextWindow::ScreenChangeGroupName, _("rename"),
+            g->h.v, &TextWindow::ScreenDeleteGroup, _("del"));
     }
 
     if(g->type == Group::Type::LATHE) {
-        Printf(true, " %Ftlathe plane sketch");
+        Printf(true, " %Ft%s", _("lathe plane sketch"));
     } else if(g->type == Group::Type::EXTRUDE || g->type == Group::Type::ROTATE ||
               g->type == Group::Type::TRANSLATE)
     {
         if(g->type == Group::Type::EXTRUDE) {
-            s = "extrude plane sketch";
+            s = _("extrude plane sketch");
         } else if(g->type == Group::Type::TRANSLATE) {
-            s = "translate original sketch";
+            s = _("translate original sketch");
         } else if(g->type == Group::Type::ROTATE) {
-            s = "rotate original sketch";
+            s = _("rotate original sketch");
         }
         Printf(true, " %Ft%s%E", s);
 
         bool one = (g->subtype == Group::Subtype::ONE_SIDED);
         Printf(false,
-            "%Ba   %f%Ls%Fd%s one-sided%E  "
-                  "%f%LS%Fd%s two-sided%E",
+            "%Ba   %f%Ls%Fd%s %s%E  "
+                  "%f%LS%Fd%s %s%E",
             &TextWindow::ScreenChangeGroupOption,
-            one ? RADIO_TRUE : RADIO_FALSE,
+            one ? RADIO_TRUE : RADIO_FALSE, _("one-sided"),
             &TextWindow::ScreenChangeGroupOption,
-            !one ? RADIO_TRUE : RADIO_FALSE);
+            !one ? RADIO_TRUE : RADIO_FALSE, _("two-sided"));
 
         if(g->type == Group::Type::ROTATE || g->type == Group::Type::TRANSLATE) {
             if(g->subtype == Group::Subtype::ONE_SIDED) {
                 bool skip = g->skipFirst;
                 Printf(false,
-                   "%Bd   %Ftstart  %f%LK%Fd%s with original%E  "
-                         "%f%Lk%Fd%s with copy #1%E",
+                   "%Bd   %Ft%s  %f%LK%Fd%s %s%E  "
+                         "%f%Lk%Fd%s %s%E",
+                	_("start"),
                     &ScreenChangeGroupOption,
-                    !skip ? RADIO_TRUE : RADIO_FALSE,
+                    !skip ? RADIO_TRUE : RADIO_FALSE, _("with original"),
                     &ScreenChangeGroupOption,
-                    skip ? RADIO_TRUE : RADIO_FALSE);
+                    skip ? RADIO_TRUE : RADIO_FALSE, _("with copy #1"));
             }
 
             int times = (int)(g->valA);
-            Printf(false, "%Bp   %Ftrepeat%E %d time%s %Fl%Ll%D%f[change]%E",
+            Printf(false, "%Bp   %Ftrepeat%E %d time%s %Fl%Ll%D%f[%s]%E",
                 (g->subtype == Group::Subtype::ONE_SIDED) ? 'a' : 'd',
                 times, times == 1 ? "" : "s",
-                g->h.v, &TextWindow::ScreenChangeExprA);
+                g->h.v, &TextWindow::ScreenChangeExprA, _("change"));
         }
     } else if(g->type == Group::Type::LINKED) {
-        Printf(true, " %Ftlink geometry from file%E");
+        Printf(true, " %Ft%s%E");
         Platform::Path relativePath = g->linkFile.RelativeTo(SS.saveFile.Parent());
         if(relativePath.IsEmpty()) {
             Printf(false, "%Ba   '%s'", g->linkFile.raw.c_str());
         } else {
             Printf(false, "%Ba   '%s'", relativePath.raw.c_str());
         }
-        Printf(false, "%Bd   %Ftscaled by%E %# %Fl%Ll%f%D[change]%E",
+        Printf(false, "%Bd   %Ft%s%E %# %Fl%Ll%f%D[%s]%E",
+        	_("scaled by"),
             g->scale,
-            &TextWindow::ScreenChangeGroupScale, g->h.v);
+            &TextWindow::ScreenChangeGroupScale, g->h.v, _("change"));
     } else if(g->type == Group::Type::DRAWING_3D) {
-        Printf(true, " %Ftsketch in 3d%E");
+        Printf(true, " %Ft%s%E", _("sketch in 3d"));
     } else if(g->type == Group::Type::DRAWING_WORKPLANE) {
-        Printf(true, " %Ftsketch in new workplane%E");
+        Printf(true, " %Ft%s%E", _("sketch in new workplane"));
     } else {
         Printf(true, "???");
     }
@@ -355,19 +358,19 @@ void TextWindow::ShowGroupInfo() {
         bool diff = (g->meshCombine == Group::CombineAs::DIFFERENCE);
         bool asy  = (g->meshCombine == Group::CombineAs::ASSEMBLE);
 
-        Printf(false, " %Ftsolid model as");
-        Printf(false, "%Ba   %f%D%Lc%Fd%s union%E  "
-                             "%f%D%Lc%Fd%s difference%E  "
-                             "%f%D%Lc%Fd%s assemble%E  ",
+        Printf(false, " %Ft%s", _("solid model as"));
+        Printf(false, "%Ba   %f%D%Lc%Fd%s %s%E  "
+                             "%f%D%Lc%Fd%s %s%E  "
+                             "%f%D%Lc%Fd%s %s%E  ",
             &TextWindow::ScreenChangeGroupOption,
             Group::CombineAs::UNION,
-            un ? RADIO_TRUE : RADIO_FALSE,
+            un ? RADIO_TRUE : RADIO_FALSE, _("union"),
             &TextWindow::ScreenChangeGroupOption,
             Group::CombineAs::DIFFERENCE,
-            diff ? RADIO_TRUE : RADIO_FALSE,
+            diff ? RADIO_TRUE : RADIO_FALSE, _("difference"),
             &TextWindow::ScreenChangeGroupOption,
             Group::CombineAs::ASSEMBLE,
-            (asy ? RADIO_TRUE : RADIO_FALSE));
+            (asy ? RADIO_TRUE : RADIO_FALSE), _("assemble"));
 
         if(g->type == Group::Type::EXTRUDE ||
            g->type == Group::Type::LATHE)
@@ -385,48 +388,54 @@ void TextWindow::ShowGroupInfo() {
         if(g->type == Group::Type::EXTRUDE ||
            g->type == Group::Type::LATHE ||
            g->type == Group::Type::LINKED) {
-            Printf(false, "   %Fd%f%LP%s  suppress this group's solid model",
+            Printf(false, "   %Fd%f%LP%s  %s",
                 &TextWindow::ScreenChangeGroupOption,
-                g->suppress ? CHECK_TRUE : CHECK_FALSE);
+                g->suppress ? CHECK_TRUE : CHECK_FALSE,
+                _("suppress this group's solid model"));
         }
 
         Printf(false, "");
     }
 
-    Printf(false, " %f%Lv%Fd%s  show entities from this group",
+    Printf(false, " %f%Lv%Fd%s  %s",
         &TextWindow::ScreenChangeGroupOption,
-        g->visible ? CHECK_TRUE : CHECK_FALSE);
+        g->visible ? CHECK_TRUE : CHECK_FALSE,
+        _("show entities from this group"));
 
     if(!g->IsForcedToMeshBySource()) {
-        Printf(false, " %f%Lf%Fd%s  force NURBS surfaces to triangle mesh",
+        Printf(false, " %f%Lf%Fd%s  %s",
             &TextWindow::ScreenChangeGroupOption,
-            g->forceToMesh ? CHECK_TRUE : CHECK_FALSE);
+            g->forceToMesh ? CHECK_TRUE : CHECK_FALSE,
+            _("force NURBS surfaces to triangle mesh"));
     } else {
-        Printf(false, " (model already forced to triangle mesh)");
+        Printf(false, " (%s)", _("model already forced to triangle mesh"));
     }
 
-    Printf(true, " %f%Lr%Fd%s  relax constraints and dimensions",
+    Printf(true, " %f%Lr%Fd%s  %s",
         &TextWindow::ScreenChangeGroupOption,
-        g->relaxConstraints ? CHECK_TRUE : CHECK_FALSE);
+        g->relaxConstraints ? CHECK_TRUE : CHECK_FALSE,
+        _("relax constraints and dimensions"));
 
-    Printf(false, " %f%Le%Fd%s  allow redundant constraints",
+    Printf(false, " %f%Le%Fd%s  %s",
         &TextWindow::ScreenChangeGroupOption,
-        g->allowRedundant ? CHECK_TRUE : CHECK_FALSE);
+        g->allowRedundant ? CHECK_TRUE : CHECK_FALSE,
+        _("allow redundant constraints"));
 
-    Printf(false, " %f%Ld%Fd%s  treat all dimensions as reference",
+    Printf(false, " %f%Ld%Fd%s  %s",
         &TextWindow::ScreenChangeGroupOption,
-        g->allDimsReference ? CHECK_TRUE : CHECK_FALSE);
+        g->allDimsReference ? CHECK_TRUE : CHECK_FALSE,
+        _("treat all dimensions as reference"));
 
     if(g->booleanFailed) {
         Printf(false, "");
-        Printf(false, "The Boolean operation failed. It may be ");
-        Printf(false, "possible to fix the problem by choosing ");
-        Printf(false, "'force NURBS surfaces to triangle mesh'.");
+        Printf(false, _("The Boolean operation failed. It may be "));
+        Printf(false, _("possible to fix the problem by choosing "));
+        Printf(false, _("'force NURBS surfaces to triangle mesh'."));
     }
 
 list_items:
     Printf(false, "");
-    Printf(false, "%Ft requests in group");
+    Printf(false, "%Ft %s", _("requests in group"));
 
     int i, a = 0;
     for(i = 0; i < SK.request.n; i++) {
@@ -441,11 +450,11 @@ list_items:
             a++;
         }
     }
-    if(a == 0) Printf(false, "%Ba   (none)");
+    if(a == 0) Printf(false, "%Ba   %s", _("(none)"));
 
     a = 0;
     Printf(false, "");
-    Printf(false, "%Ft constraints in group (%d DOF)", g->solved.dof);
+    Printf(false, "%Ft %s (%d %s)", _("constraints in group"), g->solved.dof, _("DOF"));
     for(i = 0; i < SK.constraint.n; i++) {
         Constraint *c = &(SK.constraint.elem[i]);
 
@@ -455,11 +464,11 @@ list_items:
                 (a & 1) ? 'd' : 'a',
                 c->h.v, (&TextWindow::ScreenSelectConstraint),
                 (&TextWindow::ScreenHoverConstraint), s.c_str(),
-                c->reference ? "(ref)" : "");
+                c->reference ? _("(ref)") : "");
             a++;
         }
     }
-    if(a == 0) Printf(false, "%Ba   (none)");
+    if(a == 0) Printf(false, "%Ba   %s", _("(none)"));
 }
 
 //-----------------------------------------------------------------------------
@@ -486,25 +495,25 @@ void TextWindow::ShowGroupSolveInfo() {
         return;
     }
 
-    Printf(true, "%FtGROUP   %E%s", g->DescriptionString().c_str());
+    Printf(true, "%Ft%s   %E%s", _("GROUP"), g->DescriptionString().c_str());
     switch(g->solved.how) {
         case SolveResult::DIDNT_CONVERGE:
-            Printf(true, "%FxSOLVE FAILED!%Fd unsolvable constraints");
-            Printf(true, "the following constraints are incompatible");
+            Printf(true, "%Fx%s%Fd %s", _("SOLVE FAILED!"), _("unsolvable constraints"));
+            Printf(true, _("the following constraints are incompatible"));
             break;
 
         case SolveResult::REDUNDANT_DIDNT_CONVERGE:
-            Printf(true, "%FxSOLVE FAILED!%Fd unsolvable constraints");
-            Printf(true, "the following constraints are unsatisfied");
+            Printf(true, "%Fx%s%Fd %s", _("SOLVE FAILED!"), _("unsolvable constraints"));
+            Printf(true, _("the following constraints are unsatisfied"));
             break;
 
         case SolveResult::REDUNDANT_OKAY:
-            Printf(true, "%FxSOLVE FAILED!%Fd redundant constraints");
-            Printf(true, "remove any one of these to fix it");
+            Printf(true, "%Fx%s%Fd %s", _("SOLVE FAILED!"), _("redundant constraints"));
+            Printf(true, _("remove any one of these to fix it"));
             break;
 
         case SolveResult::TOO_MANY_UNKNOWNS:
-            Printf(true, "Too many unknowns in a single group!");
+            Printf(true, _("Too many unknowns in a single group!"));
             return;
 
         default: ssassert(false, "Unexpected solve result");
@@ -522,14 +531,14 @@ void TextWindow::ShowGroupSolveInfo() {
             c->DescriptionString().c_str());
     }
 
-    Printf(true,  "It may be possible to fix the problem ");
-    Printf(false, "by selecting Edit -> Undo.");
+    Printf(false,  _("It may be possible to fix the problem "));
+    Printf(false, _("by selecting Edit -> Undo."));
 
     if(g->solved.how == SolveResult::REDUNDANT_OKAY) {
-        Printf(true,  "It is possible to suppress this error ");
-        Printf(false, "by %Fl%f%Llallowing redundant constraints%E in ",
+        Printf(true,  _("It is possible to suppress this error"));
+        Printf(false, _("by %Fl%f%Llallowing redundant constraints%E in "),
                       &TextWindow::ScreenAllowRedundant);
-        Printf(false, "this group.");
+        Printf(false, _("this group."));
     }
 }
 
@@ -582,23 +591,23 @@ void TextWindow::ShowStepDimension() {
         return;
     }
 
-    Printf(true, "%FtSTEP DIMENSION%E %s", c->DescriptionString().c_str());
+    Printf(true, "%Ft%s%E %s", _("STEP DIMENSION"), c->DescriptionString().c_str());
 
     if(shown.dimIsDistance) {
-        Printf(true,  "%Ba   %Ftstart%E    %s", SS.MmToString(c->valA).c_str());
-        Printf(false, "%Bd   %Ftfinish%E   %s %Fl%Ll%f[change]%E",
-            SS.MmToString(shown.dimFinish).c_str(), &ScreenStepDimFinish);
+        Printf(true,  "%Ba   %Ft%s%E    %s", _("start"), SS.MmToString(c->valA).c_str());
+        Printf(false, "%Bd   %Ft%s%E   %s %Fl%Ll%f[%s]%E", _("finish"),
+            SS.MmToString(shown.dimFinish).c_str(), &ScreenStepDimFinish, _("change"));
     } else {
-        Printf(true,  "%Ba   %Ftstart%E    %@", c->valA);
-        Printf(false, "%Bd   %Ftfinish%E   %@ %Fl%Ll%f[change]%E",
-            shown.dimFinish, &ScreenStepDimFinish);
+        Printf(true,  "%Ba   %Ft%s%E    %@", _("start"), c->valA);
+        Printf(false, "%Bd   %Ft%s%E   %@ %Fl%Ll%f[%s]%E", _("finish"),
+            shown.dimFinish, &ScreenStepDimFinish, _("change"));
     }
-    Printf(false, "%Ba   %Ftsteps%E    %d %Fl%Ll%f%D[change]%E",
-        shown.dimSteps, &ScreenStepDimSteps);
+    Printf(false, "%Ba   %Ft%s%E    %d %Fl%Ll%f%D[%s]%E", _("steps"),
+        shown.dimSteps, &ScreenStepDimSteps, _("change"));
 
-    Printf(true, " %Fl%Ll%fstep dimension now%E", &ScreenStepDimGo);
+    Printf(true, " %Fl%Ll%f%s%E", &ScreenStepDimGo, _("step dimension now"));
 
-    Printf(true, "(or %Fl%Ll%fcancel operation%E)", &ScreenHome);
+    Printf(true, "(or %Fl%Ll%f%s%E)", &ScreenHome, _("cancel operation"));
 }
 
 //-----------------------------------------------------------------------------
@@ -619,30 +628,33 @@ void TextWindow::ScreenChangeTangentArc(int link, uint32_t v) {
     }
 }
 void TextWindow::ShowTangentArc() {
-    Printf(true, "%FtTANGENT ARC PARAMETERS%E");
+    Printf(true, "%Ft%s%E", _("TANGENT ARC PARAMETERS"));
 
-    Printf(true,  "%Ft radius of created arc%E");
+    Printf(true,  "%Ft %s%E", _("radius of created arc"));
     if(SS.tangentArcManual) {
-        Printf(false, "%Ba   %s %Fl%Lr%f[change]%E",
+        Printf(false, "%Ba   %s %Fl%Lr%f[%s]%E",
             SS.MmToString(SS.tangentArcRadius).c_str(),
-            &(TextWindow::ScreenChangeTangentArc));
+            &(TextWindow::ScreenChangeTangentArc), _("change"));
     } else {
-        Printf(false, "%Ba   automatic");
+        Printf(false, "%Ba   %s", _("automatic"));
     }
 
     Printf(false, "");
-    Printf(false, "  %Fd%f%La%s  choose radius automatically%E",
+    Printf(false, "  %Fd%f%La%s  %s%E",
         &ScreenChangeTangentArc,
-        !SS.tangentArcManual ? CHECK_TRUE : CHECK_FALSE);
-    Printf(false, "  %Fd%f%Ld%s  delete original entities afterward%E",
+        !SS.tangentArcManual ? CHECK_TRUE : CHECK_FALSE,
+        _("choose radius automatically"));
+    Printf(false, "  %Fd%f%Ld%s  %s%E",
         &ScreenChangeTangentArc,
-        SS.tangentArcDeleteOld ? CHECK_TRUE : CHECK_FALSE);
+        SS.tangentArcDeleteOld ? CHECK_TRUE : CHECK_FALSE,
+        _("delete original entities afterward"));
 
     Printf(false, "");
-    Printf(false, "To create a tangent arc at a point,");
-    Printf(false, "select that point and then choose");
-    Printf(false, "Sketch -> Tangent Arc at Point.");
-    Printf(true, "(or %Fl%Ll%fback to home screen%E)", &ScreenHome);
+    Printf(false, _("To create a tangent arc at a point,"));
+    Printf(false, _("select that point and then choose"));
+    Printf(false, _("Sketch -> Tangent Arc at Point."));
+    Printf(true, "(%s %Fl%Ll%f%s%E)", _("or"), &ScreenHome,
+    	_("back to home screen"));
 }
 
 //-----------------------------------------------------------------------------

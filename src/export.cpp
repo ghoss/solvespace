@@ -631,10 +631,10 @@ VectorFileWriter *VectorFileWriter::ForFile(const Platform::Path &filename) {
         static GCodeFileWriter GCodeWriter;
         ret = &GCodeWriter;
     } else {
-        Error("Can't identify output file type from file extension of "
+        Error(_("Can't identify output file type from file extension of "
         "filename '%s'; try "
         ".step, .stp, .dxf, .svg, .plt, .hpgl, .pdf, .txt, .ngc, "
-        ".eps, or .ps.",
+        ".eps, or .ps."),
             filename.raw.c_str());
         return NULL;
     }
@@ -643,7 +643,7 @@ VectorFileWriter *VectorFileWriter::ForFile(const Platform::Path &filename) {
 
     FILE *f = OpenFile(filename, "wb");
     if(!f) {
-        Error("Couldn't write to '%s'", filename.raw.c_str());
+        Error(_("Couldn't write to '%s'"), filename.raw.c_str());
         return NULL;
     }
     ret->f = f;
@@ -818,7 +818,7 @@ void SolveSpaceUI::ExportMeshTo(const Platform::Path &filename) {
         Platform::Path mtlFilename = filename.WithExtension("mtl");
         FILE *fMtl = OpenFile(mtlFilename, "wb");
         if(!fMtl) {
-            Error("Couldn't write to '%s'", filename.raw.c_str());
+            Error(_("Couldn't write to '%s'"), filename.raw.c_str());
             return;
         }
 
@@ -831,8 +831,8 @@ void SolveSpaceUI::ExportMeshTo(const Platform::Path &filename) {
         SOutlineList *e = &(SK.GetGroup(SS.GW.activeGroup)->displayOutlines);
         ExportMeshAsThreeJsTo(f, filename, m, e);
     } else {
-        Error("Can't identify output file type from file extension of "
-              "filename '%s'; try .stl, .obj, .js, .html.", filename.raw.c_str());
+        Error(_("Can't identify output file type from file extension of "
+              "filename '%s'; try .stl, .obj, .js, .html."), filename.raw.c_str());
     }
 
     fclose(f);

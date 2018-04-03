@@ -31,7 +31,7 @@ std::string Constraint::Label() const {
         result = SS.MmToString(fabs(valA));
     }
     if(reference) {
-        result += " REF";
+        result += _(" REF");
     }
     return result;
 }
@@ -442,7 +442,7 @@ void Constraint::DoArcForAngle(Canvas *canvas, Canvas::hStroke hcs,
         double textHeight = Style::TextHeight(GetStyle()) / camera.scale;
         Vector trans =
             (*ref).Plus(gu.ScaledBy(-1.5*VectorFont::Builtin()->GetCapHeight(textHeight)));
-        canvas->DrawVectorText("angle between skew lines", textHeight,
+        canvas->DrawVectorText(_("angle between skew lines"), textHeight,
                                trans, gr.WithMagnitude(1), gu.WithMagnitude(1),
                                hcs);
     }
