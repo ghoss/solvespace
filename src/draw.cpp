@@ -894,11 +894,11 @@ void GraphicsWindow::Paint() {
     } else {
         renderTimeColor = { 255, 255, 255, 255 };
     }
-    uiCanvas.DrawBitmapText(ssprintf(_("%s %ld ms (%ld 1/s)"),
+    uiCanvas.DrawBitmapText(ssprintf("%s %ld ms (%ld 1/s)",
     	_("rendered in"),
-		(long)renderTime.count(),
-		(long)(1000/renderTime.count())),
-		5, 5, renderTimeColor);
+        (long)renderTime.count(),
+        (long)(1000/renderTime.count())),
+        5, 5, renderTimeColor);
 
     canvas->FlushFrame();
     canvas->Clear();

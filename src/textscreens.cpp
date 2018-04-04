@@ -428,9 +428,9 @@ void TextWindow::ShowGroupInfo() {
 
     if(g->booleanFailed) {
         Printf(false, "");
-        Printf(false, _("The Boolean operation failed. It may be "));
-        Printf(false, _("possible to fix the problem by choosing "));
-        Printf(false, _("'force NURBS surfaces to triangle mesh'."));
+        Printf(false, "%s", _("The Boolean operation failed. It may be "));
+        Printf(false, "%s", _("possible to fix the problem by choosing "));
+        Printf(false, "%s", _("'force NURBS surfaces to triangle mesh'."));
     }
 
 list_items:
@@ -499,21 +499,21 @@ void TextWindow::ShowGroupSolveInfo() {
     switch(g->solved.how) {
         case SolveResult::DIDNT_CONVERGE:
             Printf(true, "%Fx%s%Fd %s", _("SOLVE FAILED!"), _("unsolvable constraints"));
-            Printf(true, _("the following constraints are incompatible"));
+            Printf(true, "%s", _("the following constraints are incompatible"));
             break;
 
         case SolveResult::REDUNDANT_DIDNT_CONVERGE:
             Printf(true, "%Fx%s%Fd %s", _("SOLVE FAILED!"), _("unsolvable constraints"));
-            Printf(true, _("the following constraints are unsatisfied"));
+            Printf(true, "%s", _("the following constraints are unsatisfied"));
             break;
 
         case SolveResult::REDUNDANT_OKAY:
             Printf(true, "%Fx%s%Fd %s", _("SOLVE FAILED!"), _("redundant constraints"));
-            Printf(true, _("remove any one of these to fix it"));
+            Printf(true, "%s", _("remove any one of these to fix it"));
             break;
 
         case SolveResult::TOO_MANY_UNKNOWNS:
-            Printf(true, _("Too many unknowns in a single group!"));
+            Printf(true, "%s", _("Too many unknowns in a single group!"));
             return;
 
         default: ssassert(false, "Unexpected solve result");
@@ -531,14 +531,14 @@ void TextWindow::ShowGroupSolveInfo() {
             c->DescriptionString().c_str());
     }
 
-    Printf(false,  _("It may be possible to fix the problem "));
-    Printf(false, _("by selecting Edit -> Undo."));
+    Printf(false, "%s", _("It may be possible to fix the problem"));
+    Printf(false, "%s", _("by selecting Edit -> Undo."));
 
     if(g->solved.how == SolveResult::REDUNDANT_OKAY) {
-        Printf(true,  _("It is possible to suppress this error"));
-        Printf(false, _("by %Fl%f%Llallowing redundant constraints%E in "),
+        Printf(true,  "%s", _("It is possible to suppress this error"));
+        Printf(false, "%s", _("by allowing redundant constraints in "),
                       &TextWindow::ScreenAllowRedundant);
-        Printf(false, _("this group."));
+        Printf(false, "%s", _("this group."));
     }
 }
 
@@ -650,9 +650,9 @@ void TextWindow::ShowTangentArc() {
         _("delete original entities afterward"));
 
     Printf(false, "");
-    Printf(false, _("To create a tangent arc at a point,"));
-    Printf(false, _("select that point and then choose"));
-    Printf(false, _("Sketch -> Tangent Arc at Point."));
+    Printf(false, "%s", _("To create a tangent arc at a point,"));
+    Printf(false, "%s", _("select that point and then choose"));
+    Printf(false, "%s", _("Sketch -> Tangent Arc at Point."));
     Printf(true, "(%s %Fl%Ll%f%s%E)", _("or"), &ScreenHome,
     	_("back to home screen"));
 }
