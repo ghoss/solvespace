@@ -1,6 +1,11 @@
 SolveSpace
 ==========
 
+Ins Deutsche übersetzte Version von [SolveSpace][], einem parametrischen 2D/3D CAD-Programm.
+
+Diese Version basiert auf der Originalversion 3.0-a49a7384 unter https://github.com/solvespace/solvespace .
+
+
 This repository contains a fork of [SolveSpace][], a parametric 2d/3d CAD.
 
 [solvespace]: http://solvespace.com
