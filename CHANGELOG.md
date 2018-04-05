@@ -10,4 +10,4 @@ ChangeLog
 ------------
 * German localization
 * All hard-coded English strings still present in the original branch have been localized
-* Included bugfix for issue #316 in original repository (crash at startup under Mac OS X 10.9)
+* Included bugfix for [issue #316](https://github.com/solvespace/solvespace/issues/316) in original repository (crash at startup under Mac OS X 10.9)
