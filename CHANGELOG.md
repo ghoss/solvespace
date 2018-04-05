@@ -3,7 +3,7 @@ ChangeLog
 
 3.0-fd3b1013
 ------------
-* Proof-of-concept solution for [issue #320](https://github.com/solvespace/solvespace/issues/320) (recursive calls in `bsp.cpp`may cause stack overflow when loading or exporting models with triangle meshes). For a start, recursion has been substituted by a queue solution in InsertConvex(). Similar solutions could eventually be applied to the other recursive BSP functions as well.
+* Proof-of-concept solution for [issue #320](https://github.com/solvespace/solvespace/issues/320) (recursive calls in `bsp.cpp`may cause stack overflow when loading or exporting models with triangle meshes). For a start, recursion has been substituted by a queue solution in `InsertConvex()`. Similar solutions could eventually be applied to the other recursive BSP functions as well.
 * Some minor fixes to German translations
 
 3.0-a49a7384
