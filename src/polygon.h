@@ -237,9 +237,8 @@ public:
     void Insert(STriangle *str, SMesh *instead);
     static SBsp3 *InsertOrCreate(SBsp3 *where, STriangle *str, SMesh *instead);
 
-    void InsertConvexHow(BspClass how, STriMeta meta, Vector *vertex, size_t n,
-                                SMesh *instead);
-    SBsp3 *InsertConvex(STriMeta meta, Vector *vertex, size_t n, SMesh *instead);
+	static void InsertConvex(SBsp3 **node, STriMeta meta, Vector *vec, size_t nc, 
+		SMesh *instead);
 
     void InsertInPlane(bool pos2, STriangle *tr, SMesh *m);
 

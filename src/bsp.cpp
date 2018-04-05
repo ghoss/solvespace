@@ -126,6 +126,7 @@ alt:
 }
 
 class BspUtil {
+
 public:
     SBsp3      *bsp;
 
@@ -383,56 +384,82 @@ public:
         }
         return bsp;
     }
+
+	static void TriangulateConvex(SBsp3 *obj, BspClass how, STriMeta meta, Vector *vertex, 
+		size_t n, SMesh *instead)
+	{
+		for(size_t i = 0; i < n - 2; i++) {
+			STriangle tr = STriangle::From(meta, vertex[0], vertex[i+1], vertex[i+2]);
+			obj->InsertHow(how, &tr, instead);
+		}
+	}
 };
 
-void SBsp3::InsertConvexHow(BspClass how, STriMeta meta, Vector *vertex, size_t n,
-                            SMesh *instead) {
-    switch(how) {
-        case BspClass::POS:
-            if(pos) {
-                pos = pos->InsertConvex(meta, vertex, n, instead);
-                return;
-            }
-            break;
 
-        case BspClass::NEG:
-            if(neg) {
-                neg = neg->InsertConvex(meta, vertex, n, instead);
-                return;
-            }
-            break;
-
-        default: ssassert(false, "Unexpected BSP insert type");
-    }
-
-    for(size_t i = 0; i < n - 2; i++) {
-        STriangle tr = STriangle::From(meta,
-                                       vertex[0], vertex[i+1], vertex[i+2]);
-        InsertHow(how, &tr, instead);
-    }
-}
-
-SBsp3 *SBsp3::InsertConvex(STriMeta meta, Vector *vertex, size_t cnt, SMesh *instead) {
-    BspUtil *u = BspUtil::Alloc();
-    if(u->ClassifyConvex(vertex, cnt, this, !instead)) {
-        if(u->posc == 0) {
-            InsertConvexHow(BspClass::NEG, meta, vertex, cnt, instead);
-            return this;
-        }
-        if(u->negc == 0) {
-            InsertConvexHow(BspClass::POS, meta, vertex, cnt, instead);
-            return this;
-        }
-
-        if(u->ClassifyConvexVertices(vertex, cnt, !instead)) {
-            InsertConvexHow(BspClass::NEG, meta, u->vneg, u->nneg, instead);
-            InsertConvexHow(BspClass::POS, meta, u->vpos, u->npos, instead);
-            return this;
-        }
-    }
-
-    // We don't handle the special case for this; do it as triangles
-    return BspUtil::Triangulate(this, meta, vertex, cnt, instead);
+void SBsp3::InsertConvex(SBsp3 **node, STriMeta meta, Vector *vec, size_t nc, 
+	SMesh *instead) {
+	
+	struct insQueue_t {
+		SBsp3 **obj;
+		Vector *v;
+		size_t n;
+	};
+	
+	static std::queue <insQueue_t> insQueue;
+	
+	insQueue.push({node, vec, nc});
+	while (! insQueue.empty())
+	{	
+		BspUtil *u = BspUtil::Alloc();
+		insQueue_t active = insQueue.front();
+		insQueue.pop();
+		SBsp3 **obj = active.obj;
+		SBsp3 *retVal = *obj;
+	
+		if(u->ClassifyConvex(active.v, active.n, *obj, !instead)) {
+			if(u->posc == 0) {
+				if((*obj)->neg) {
+					insQueue.push({&((*obj)->neg), active.v, active.n});
+				}
+				else {
+					BspUtil::TriangulateConvex(*obj, BspClass::NEG, meta, 
+						active.v, active.n, instead);
+				}
+			}
+			else if(u->negc == 0) {
+				if((*obj)->pos) {
+					insQueue.push({&((*obj)->pos), active.v, active.n});
+				}
+				else {
+					BspUtil::TriangulateConvex(*obj, BspClass::POS, meta, 
+						active.v, active.n, instead);
+				}
+			}
+			else if(u->ClassifyConvexVertices(active.v, active.n, !instead)) {
+				if((*obj)->neg) {
+					insQueue.push({&((*obj)->neg), u->vneg, u->nneg});
+				}
+				else {
+					BspUtil::TriangulateConvex(*obj, BspClass::NEG, meta, 
+						u->vneg, u->nneg, instead);
+				}
+				if((*obj)->pos) {
+					insQueue.push({&((*obj)->pos), u->vpos, u->npos});
+				}
+				else {
+					BspUtil::TriangulateConvex(*obj, BspClass::POS, meta, 
+						u->vpos, u->npos, instead);
+				}
+			}
+			else {
+				retVal = BspUtil::Triangulate(*obj, meta, active.v, active.n, instead);
+			}
+		}
+		else {
+			retVal = BspUtil::Triangulate(*obj, meta, active.v, active.n, instead);
+		}
+		*obj = retVal;
+	}
 }
 
 SBsp3 *SBsp3::InsertOrCreate(SBsp3 *where, STriangle *tr, SMesh *instead) {
@@ -495,10 +522,20 @@ void SBsp3::Insert(STriangle *tr, SMesh *instead) {
 
     // The polygon must be split into two pieces: a triangle and a quad.
     if(u->SplitIntoTwoPieces(!instead)) {
-        InsertConvexHow(BspClass::POS, tr->meta, u->vpos, 4, instead);
+		if(pos) {
+			InsertConvex(&pos, tr->meta, u->vpos, 4, instead);
+		}
+		else {
+			BspUtil::TriangulateConvex(this, BspClass::POS, tr->meta, u->vpos, 4, instead);
+		}
         InsertHow(BspClass::NEG, u->btri, instead);
     } else {
-        InsertConvexHow(BspClass::NEG, tr->meta, u->vpos, 4, instead);
+		if(neg) {
+			InsertConvex(&neg, tr->meta, u->vpos, 4, instead);
+		}
+		else {
+			BspUtil::TriangulateConvex(this, BspClass::NEG, tr->meta, u->vpos, 4, instead);
+		}
         InsertHow(BspClass::POS, u->btri, instead);
     }
 }

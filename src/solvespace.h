@@ -30,6 +30,7 @@
 #include <set>
 #include <chrono>
 #include <sstream>
+#include <queue>
 
 // We declare these in advance instead of simply using FT_Library
 // (defined as typedef FT_LibraryRec_* FT_Library) because including
