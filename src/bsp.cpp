@@ -104,6 +104,9 @@ void SBsp3::InsertHow(BspClass how, STriangle *tr, SMesh *instead) {
             more = m;
             break;
         }
+        
+        default :
+        	break;
     }
     return;
 
@@ -403,11 +406,12 @@ void SBsp3::InsertConvex(SBsp3 **node, STriMeta meta, Vector *vec, size_t nc,
 		SBsp3 **obj;
 		Vector *v;
 		size_t n;
+		BspClass tMode;
 	};
 	
 	static std::queue <insQueue_t> insQueue;
 	
-	insQueue.push({node, vec, nc});
+	insQueue.push({node, vec, nc, BspClass::NOOP});
 	while (! insQueue.empty())
 	{	
 		BspUtil *u = BspUtil::Alloc();
@@ -416,39 +420,39 @@ void SBsp3::InsertConvex(SBsp3 **node, STriMeta meta, Vector *vec, size_t nc,
 		SBsp3 **obj = active.obj;
 		SBsp3 *retVal = *obj;
 	
-		if(u->ClassifyConvex(active.v, active.n, *obj, !instead)) {
+		if (active.tMode != BspClass::NOOP) {
+			BspUtil::TriangulateConvex(*obj, active.tMode, meta, 
+				active.v, active.n, instead);		
+		}
+		else if(u->ClassifyConvex(active.v, active.n, *obj, !instead)) {
 			if(u->posc == 0) {
 				if((*obj)->neg) {
-					insQueue.push({&((*obj)->neg), active.v, active.n});
+					insQueue.push({&((*obj)->neg), active.v, active.n, BspClass::NOOP});
 				}
 				else {
-					BspUtil::TriangulateConvex(*obj, BspClass::NEG, meta, 
-						active.v, active.n, instead);
+					insQueue.push({obj, active.v, active.n, BspClass::NEG});
 				}
 			}
 			else if(u->negc == 0) {
 				if((*obj)->pos) {
-					insQueue.push({&((*obj)->pos), active.v, active.n});
+					insQueue.push({&((*obj)->pos), active.v, active.n, BspClass::NOOP});
 				}
 				else {
-					BspUtil::TriangulateConvex(*obj, BspClass::POS, meta, 
-						active.v, active.n, instead);
+					insQueue.push({obj, active.v, active.n, BspClass::POS});
 				}
 			}
 			else if(u->ClassifyConvexVertices(active.v, active.n, !instead)) {
 				if((*obj)->neg) {
-					insQueue.push({&((*obj)->neg), u->vneg, u->nneg});
+					insQueue.push({&((*obj)->neg), u->vneg, u->nneg, BspClass::NOOP});
 				}
 				else {
-					BspUtil::TriangulateConvex(*obj, BspClass::NEG, meta, 
-						u->vneg, u->nneg, instead);
+					insQueue.push({obj, u->vneg, u->nneg, BspClass::NEG});
 				}
 				if((*obj)->pos) {
-					insQueue.push({&((*obj)->pos), u->vpos, u->npos});
+					insQueue.push({&((*obj)->pos), u->vpos, u->npos, BspClass::NOOP});
 				}
 				else {
-					BspUtil::TriangulateConvex(*obj, BspClass::POS, meta, 
-						u->vpos, u->npos, instead);
+					insQueue.push({obj, u->vpos, u->npos, BspClass::POS});
 				}
 			}
 			else {

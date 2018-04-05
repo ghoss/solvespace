@@ -24,7 +24,8 @@ enum class EarType : uint32_t {
 enum class BspClass : uint32_t {
     POS         = 100,
     NEG         = 101,
-    COPLANAR    = 200
+    COPLANAR    = 200,
+    NOOP		= 999
 };
 
 enum class EdgeKind : uint32_t {
