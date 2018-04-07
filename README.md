@@ -12,7 +12,3 @@ This repository contains a fork of [SolveSpace][], a parametric 2d/3d CAD.
 [solvespace]: http://solvespace.com
 
 This fork (of version 3.0-a49a7384) incorporates several extensions and bugfixes to the original branch at https://github.com/solvespace/solvespace. See [CHANGELOG.md](https://github.com/ghoss/solvespace/blob/master/CHANGELOG.md) for details.
-
-* German localization
-* All hard-coded English strings still present in the original branch have been localized
-* Included bugfix for issue #316 in original repository (crash at startup under Mac OS X 10.9)
