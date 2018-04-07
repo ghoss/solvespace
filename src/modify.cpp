@@ -603,53 +603,107 @@ void GraphicsWindow::SplitLinesOrCurves() {
     }
 
     GroupSelection();
-    if(!(gs.n == 2 &&(gs.lineSegments +
-                      gs.circlesOrArcs +
-                      gs.cubics +
-                      gs.periodicCubics) == 2))
+    long eCount = (gs.lineSegments + 
+    				gs.circlesOrArcs +
+					gs.cubics +
+					gs.periodicCubics);
+					
+    if (! (((eCount == 2) && (gs.points == 0)) || ((eCount == 1) && (gs.points == 1))))
     {
-        Error(_("Select two entities that intersect each other (e.g. two lines "
-                "or two circles or a circle and a line)."));
+        Error(_("Select two entities that intersect each other "
+        		"(e.g. two lines/circles/arcs or a line/circle/arc and a point)."));
         return;
     }
-
+	
     hEntity ha = gs.entity[0],
-            hb = gs.entity[1];
+            hb = (gs.points == 0) ? gs.entity[1] : gs.point[0];
+
     Entity *ea = SK.GetEntity(ha),
            *eb = SK.GetEntity(hb);
+	SPointList inters = {};
+	SBezierList sbla = {}, sblb = {};
+	Vector pi = Vector::From(0, 0, 0);
+	bool success = false;
+	int gsPoints = gs.points;
+	
 
-    // Compute the possibly-rational Bezier curves for each of these entities
-    SBezierList sbla, sblb;
-    sbla = {};
-    sblb = {};
-    ea->GenerateBezierCurves(&sbla);
-    eb->GenerateBezierCurves(&sblb);
-    // and then compute the points where they intersect, based on those curves.
-    SPointList inters = {};
-    sbla.AllIntersectionsWith(&sblb, &inters);
-
-    if(inters.l.n > 0) {
-        Vector pi = Vector::From(0, 0, 0);
-        // If there's multiple points, then take the one closest to the
-        // mouse pointer.
-        double dmin = VERY_POSITIVE;
-        SPoint *sp;
-        for(sp = inters.l.First(); sp; sp = inters.l.NextAfter(sp)) {
-            double d = ProjectPoint(sp->p).DistanceTo(currentMousePosition);
-            if(d < dmin) {
-                dmin = d;
-                pi = sp->p;
-            }
+	if (gsPoints == 0)
+	{
+		// Compute the possibly-rational Bezier curves for each of these non-point entities
+		ea->GenerateBezierCurves(&sbla);
+		eb->GenerateBezierCurves(&sblb);
+		// and then compute the points where they intersect, based on those curves.
+		sbla.AllIntersectionsWith(&sblb, &inters);
+		success = true;
+		
+		// If there's multiple points, then take the one closest to the mouse pointer.
+		if(inters.l.n > 0) {
+			double dmin = VERY_POSITIVE;
+			SPoint *sp;
+			for(sp = inters.l.First(); sp; sp = inters.l.NextAfter(sp)) {
+				double d = ProjectPoint(sp->p).DistanceTo(currentMousePosition);
+				if(d < dmin) {
+					dmin = d;
+					pi = sp->p;
+				}
+			}
+		}	
+	}
+	else
+	{
+		// One of the entities is a point, and this point must be on the other entity
+		// Verify that a corresponding coincidence constraint exists for the point/entity
+		// ha already points to the entity, hb to the point
+		Vector p0 = ea->EndpointStart(),
+			p1 = ea->EndpointFinish();
+			
+        for(const Constraint &c : SK.constraint) {
+            if (((c.ptA.request().v == hb.request().v)  &&
+            	((c.entityA.request().v == ha.request().v))))
+			{
+				pi = SK.GetEntity(c.ptA)->PointGetNum();
+				
+				// Check if point pi is between line endpoints (i.e. actually intersects)
+				if ((p0.x < pi.x) && (pi.x < p1.x)) {
+					success = true;
+					break;
+				}
+			}
         }
+	}
 
+    if (success) {
         SS.UndoRemember();
         hEntity hia = SplitEntity(ha, pi),
-                hib = SplitEntity(hb, pi);
+                hib = {};
         // SplitEntity adds the coincident constraints to join the split halves
         // of each original entity; and then we add the constraint to join
         // the two entities together at the split point.
-        if(hia.v && hib.v) {
-            Constraint::ConstrainCoincident(hia, hib);
+        if (gsPoints == 0) {
+        	// Split second non-point entity and add constraint
+        	hib = SplitEntity(hb, pi);
+			if (hia.v && hib.v) {
+				Constraint::ConstrainCoincident(hia, hib);
+			}
+		}
+        else {
+        	// Remove datum point, as it has now been superseded by the split point
+			Request *re;
+			SK.request.ClearTags();
+			for(re = SK.request.First(); re; re = SK.request.NextAfter(re)) {
+				if (re->h.v == hb.request().v) {
+					if (re->type == Request::Type::DATUM_POINT) {
+						// Delete datum point
+						re->tag = 1;
+					}
+					else {
+						// Add constraint if not datum point, but endpoint of line/arc etc.
+						Constraint::ConstrainCoincident(hia, hb);
+					}
+					break;
+				}
+            }
+			DeleteTaggedRequests();
         }
     } else {
         Error(_("Can't split; no intersection found."));
@@ -661,4 +715,3 @@ void GraphicsWindow::SplitLinesOrCurves() {
     sblb.Clear();
     ClearSelection();
 }
-
