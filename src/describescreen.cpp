@@ -309,12 +309,12 @@ void TextWindow::DescribeSelection() {
         Vector lp0 = SK.GetEntity(ln->point[0])->PointGetNum(),
                lp1 = SK.GetEntity(ln->point[1])->PointGetNum();
         Printf(false, "%Ft%s%E", _("LINE SEGMENT AND POINT"));
-        Printf(true,  "   %s " PT_AS_STR, _("ln thru"), COSTR(lp0));
-        Printf(false, "           " PT_AS_STR, COSTR(lp1));
+        Printf(true,  "%S " PT_AS_STR, _("ln thru"), -15, COSTR(lp0));
+        Printf(false, "%S " PT_AS_STR, "", -15, COSTR(lp1));
         Entity *p  = SK.GetEntity(gs.point[0]);
         Vector pp = p->PointGetNum();
-        Printf(true,  "     %s " PT_AS_STR, _("point"), COSTR(pp));
-        Printf(true,  " %s = %Fi%s%E", _("pt-ln distance"), 
+        Printf(true,  "%S " PT_AS_STR, _("point"), -15, COSTR(pp));
+        Printf(true,  "%s = %Fi%s%E", _("pt-ln distance"), 
             SS.MmToString(pp.DistanceToLine(lp0, lp1.Minus(lp0))).c_str());
         hEntity wrkpl = SS.GW.ActiveWorkplane();
         if(wrkpl.v != Entity::FREE_IN_3D.v &&
@@ -335,14 +335,14 @@ void TextWindow::DescribeSelection() {
         v0 = v0.WithMagnitude(1);
         v1 = v1.WithMagnitude(1);
 
-        Printf(true,  "  %s = " PT_AS_NUM, _("vectorA"), CO(v0));
-        Printf(false, "  %s = " PT_AS_NUM, _("vectorB"), CO(v1));
+        Printf(true,  "%s = " PT_AS_NUM, _("vectorA"), CO(v0));
+        Printf(false, "%s = " PT_AS_NUM, _("vectorB"), CO(v1));
 
         double theta = acos(v0.Dot(v1));
-        Printf(true,  "    %s = %Fi%2%E %s", _("angle"), theta*180/PI, _("degrees"));
+        Printf(true,  "%S = %Fi%2%E %s", _("angle"), -15, theta*180/PI, _("degrees"));
         while(theta < PI/2) theta += PI;
         while(theta > PI/2) theta -= PI;
-        Printf(false, " %s = %Fi%2%E (mod 180)", _("or angle"), theta*180/PI);
+        Printf(false, "%S = %Fi%2%E (mod 180)", _("or angle"), -15, theta*180/PI);
     } else if(gs.n == 2 && gs.faces == 2) {
         Printf(false, "%Ft%s", _("TWO PLANE FACES"));
 

@@ -1160,9 +1160,8 @@ msgstr "Trennen ist nur in einer Arbeitsebene möglich."
 
 #: modify.cpp:611
 msgid ""
-"Select two entities that intersect each other (e.g. two lines or two circles or a circle and a "
-"line)."
-msgstr "Wählen Sie zwei Objekte aus, die sich schneiden (z.B. zwei Linien, oder zwei Kreise, oder ein Kreis und eine Linie)."
+"Select two entities that intersect each other (e.g. two lines/circles/arcs or a line/circle/arc and a point)."
+msgstr "Wählen Sie zwei Objekte aus, die sich schneiden (z.B. zwei Linien/Kreise/Bögen, oder eine Linie/Kreis/Bogen und ein Punkt)."
 
 #: modify.cpp:655
 msgid "Can't split; no intersection found."
@@ -1962,6 +1961,8 @@ msgid "remove assigned style"
 msgstr "Zugeordneten Linientyp entfernen"
 msgid "unselect all"
 msgstr "Auswahl aufheben"
+msgid "pt-ln distance"
+msgstr "Punkt-Liniendistanz"
 
 #: draw.cpp
 msgid "previewing exported geometry; press Esc to return"
