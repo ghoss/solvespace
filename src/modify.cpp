@@ -664,7 +664,8 @@ void GraphicsWindow::SplitLinesOrCurves() {
                 pi = SK.GetEntity(c.ptA)->PointGetNum();
                 
                 // Check if point pi is between line endpoints (i.e. actually intersects)
-                if ((p0.x < pi.x) && (pi.x < p1.x)) {
+                if (((p0.x < pi.x) && (pi.x < p1.x)) ||
+                    ((p1.x < pi.x) && (pi.x < p0.x))) {
                     success = true;
                     break;
                 }
