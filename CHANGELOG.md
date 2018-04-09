@@ -3,7 +3,7 @@ ChangeLog
 
 3.0-dce7ad1 (April 7, 2018)
 ---------------------------
-* Implemented "Split Line at Point" as an extension to "Split Line at Intersection". Not only intersecting lines/curves can be split now, but also a line/curve at a datum point / midpoint / curve-endpoint constrained to it.
+* Implemented "Split Line at Point" as an extension to "Split Line at Intersection" ([issue #321](https://github.com/solvespace/solvespace/issues/321)). Not only intersecting lines/curves can be split now, but also a line/curve at a datum point / midpoint / curve-endpoint constrained to it.
 
 3.0-092cb6c (April 5, 2018)
 ---------------------------
