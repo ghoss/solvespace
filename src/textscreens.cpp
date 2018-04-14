@@ -330,14 +330,11 @@ void TextWindow::ShowGroupInfo() {
                 g->h.v, &TextWindow::ScreenChangeExprA, _("change"));
         }
     } else if(g->type == Group::Type::LINKED) {
-        Printf(true, " %Ft%s%E");
+        Printf(true, "%Ft%s%E", _("link geometry from file"));
         Platform::Path relativePath = g->linkFile.RelativeTo(SS.saveFile.Parent());
-        if(relativePath.IsEmpty()) {
-            Printf(false, "%Ba   '%s'", g->linkFile.raw.c_str());
-        } else {
-            Printf(false, "%Ba   '%s'", relativePath.raw.c_str());
-        }
-        Printf(false, "%Bd   %Ft%s%E %# %Fl%Ll%f%D[%s]%E",
+        Printf(false, "%Ba  '%s'", 
+            relativePath.IsEmpty() ? g->linkFile.raw.c_str() : relativePath.raw.c_str());
+        Printf(false, "%Bd%Ft%s%E %# %Fl%Ll%f%D[%s]%E",
         	_("scaled by"),
             g->scale,
             &TextWindow::ScreenChangeGroupScale, g->h.v, _("change"));
