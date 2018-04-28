@@ -72,6 +72,8 @@ static ToolIcon Toolbar[] = {
       N_("New group step and repeat rotating"),               {} },
     { "step-translate",  Command::GROUP_TRANS,
       N_("New group step and repeat translating"),            {} },
+    { "mirror",  Command::GROUP_MIRROR,
+      N_("New group mirroring active sketch"),            {} },
     { "sketch-in-plane", Command::GROUP_WRKPL,
       N_("New group in new workplane (thru given entities)"), {} },
     { "sketch-in-3d",    Command::GROUP_3D,

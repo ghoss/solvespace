@@ -93,6 +93,7 @@ const GraphicsWindow::MenuEntry GraphicsWindow::menu[] = {
 { 1, NULL,                              Command::NONE,             0,       TN, NULL  },
 { 1, N_("E&xtrude"),                    Command::GROUP_EXTRUDE,    S|'X',   TN, mGrp  },
 { 1, N_("&Lathe"),                      Command::GROUP_LATHE,      S|'L',   TN, mGrp  },
+{ 1, N_("&Mirror"),                     Command::GROUP_MIRROR,     S|'M',   TN, mGrp  },
 { 1, NULL,                              Command::NONE,             0,       TN, NULL  },
 { 1, N_("Link / Assemble..."),          Command::GROUP_LINK,       S|'I',   TN, mGrp  },
 { 1, N_("Link Recent"),                 Command::GROUP_RECENT,     0,       TN, mGrp  },

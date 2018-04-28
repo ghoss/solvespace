@@ -163,6 +163,7 @@ add_resources(
     icons/graphics-window/lathe.png
     icons/graphics-window/length.png
     icons/graphics-window/line.png
+    icons/graphics-window/mirror.png
     icons/graphics-window/ontoworkplane.png
     icons/graphics-window/other-supp.png
     icons/graphics-window/parallel.png

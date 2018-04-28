@@ -324,11 +324,14 @@ void TextWindow::ShowGroupInfo() {
             }
 
             int times = (int)(g->valA);
-            Printf(false, "%Bp   %Ftrepeat%E %d time%s %Fl%Ll%D%f[%s]%E",
+            Printf(false, "%Bp   %Ft%s%E %d %s %Fl%Ll%D%f[%s]%E",
                 (g->subtype == Group::Subtype::ONE_SIDED) ? 'a' : 'd',
-                times, times == 1 ? "" : "s",
+                _("repeat"),
+                times, times == 1 ? _("time") : _("times"),
                 g->h.v, &TextWindow::ScreenChangeExprA, _("change"));
         }
+    } else if (g->type == Group::Type::MIRROR) {
+        Printf(true, "%Ft%s%E", _("mirrored sketch"));        
     } else if(g->type == Group::Type::LINKED) {
         Printf(true, "%Ft%s%E", _("link geometry from file"));
         Platform::Path relativePath = g->linkFile.RelativeTo(SS.saveFile.Parent());

@@ -489,6 +489,13 @@ Vector EntityBase::PointGetNum() const {
             break;
         }
 
+        case Type::POINT_N_MIRROR: {
+        	// TODO
+            Vector trans = Vector::From(param[0], param[1], param[2]);
+            p = numPoint.Plus(trans.ScaledBy(timesApplied));
+        	break;
+        }
+
         case Type::POINT_N_ROT_TRANS: {
             Vector offset = Vector::From(param[0], param[1], param[2]);
             Quaternion q = PointGetQuaternion();
