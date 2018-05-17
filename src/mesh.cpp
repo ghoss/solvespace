@@ -289,17 +289,12 @@ void SMesh::MakeFromDifferenceOf(SMesh *a, SMesh *b) {
 }
 
 void SMesh::MakeFromIntersectionOf(SMesh *a, SMesh *b) {
-	// TODO
-    SBsp3 *bspa = SBsp3::FromMesh(a);
-    SBsp3 *bspb = SBsp3::FromMesh(b);
+	SMesh c = {};
 
-    flipNormal = true;
-    keepCoplanar = true;
-    AddAgainstBsp(b, bspa);
+	c.MakeFromDifferenceOf(a, b);
+	MakeFromDifferenceOf(a, &c);
 
-    flipNormal = false;
-    keepCoplanar = false;
-    AddAgainstBsp(a, bspb);
+	c.Clear();
 }
 
 void SMesh::MakeFromCopyOf(SMesh *a) {
