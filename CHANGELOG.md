@@ -1,6 +1,10 @@
 ChangeLog
 =========
 
+3.0-c427d5c (May 17, 2018)
+--------------------------
+* Implemented Boolean "Intersection" operation for groups to complement the already existing "Union" and "Difference" ops. This op is useful to isolate a small part of a larger object for test 3D printing, for example.
+
 3.0-dce7ad1 (April 7, 2018)
 ---------------------------
 * Implemented "Split Line at Point" as an extension to "Split Line at Intersection" ([issue #321](https://github.com/solvespace/solvespace/issues/321)). Not only intersecting lines/curves can be split now, but also a line/curve at a datum point / midpoint / curve-endpoint constrained to it.
