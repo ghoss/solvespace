@@ -288,6 +288,20 @@ void SMesh::MakeFromDifferenceOf(SMesh *a, SMesh *b) {
     AddAgainstBsp(a, bspb);
 }
 
+void SMesh::MakeFromIntersectionOf(SMesh *a, SMesh *b) {
+	// TODO
+    SBsp3 *bspa = SBsp3::FromMesh(a);
+    SBsp3 *bspb = SBsp3::FromMesh(b);
+
+    flipNormal = true;
+    keepCoplanar = true;
+    AddAgainstBsp(b, bspa);
+
+    flipNormal = false;
+    keepCoplanar = false;
+    AddAgainstBsp(a, bspb);
+}
+
 void SMesh::MakeFromCopyOf(SMesh *a) {
     int i;
     for(i = 0; i < a->l.n; i++) {

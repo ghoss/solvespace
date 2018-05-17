@@ -733,6 +733,8 @@ msgstr "Extrudieren"
 #: graphicswin.cpp:95
 msgid "&Lathe"
 msgstr "Rotieren"
+msgid "&Mirror"
+msgstr "Spiegeln"
 
 #: graphicswin.cpp:97
 msgid "Link / Assemble..."
@@ -1113,6 +1115,21 @@ msgstr "Drehen"
 msgctxt "group-name"
 msgid "translate"
 msgstr "Versetzen"
+
+#: group.cpp
+msgctxt "group-name"
+msgid "mirror"
+msgstr "Spiegeln"
+
+#: group.cpp
+msgid "Bad selection for new mirror. This group can "
+"be created with:\n\n"
+"    * a line segment (mirror across line)\n"
+"    * a workplane (mirror across workplane)\n"
+msgstr "Ungültige Auswahl für neue Spiegelung Diese Gruppe kann erstellt werden mit:\n"
+"\n"
+"    * einer Linie (Spiegelung zu Linie)\n"
+"    * einer Arbeitsebene (Spiegelung zu Ebene)\n"
 
 #: group.cpp:340
 msgid "(unnamed)"
@@ -1516,6 +1533,10 @@ msgstr "Durchsichtigkeit muss zwischen Null und Eins sein."
 msgid "Radius cannot be zero or negative."
 msgstr "Radius darf nicht null oder negativ sein."
 
+#: textscreens.cpp
+msgid "mirrored sketch"
+msgstr "Gespiegelte Skizze"
+
 #: toolbar.cpp:18
 msgid "Sketch line segment"
 msgstr "Liniensegment erstellen"
@@ -1624,6 +1645,9 @@ msgstr "Neue Gruppe mit kopierter gedrehter Skizze"
 msgid "New group step and repeat translating"
 msgstr "Neue Gruppe mit kopierter versetzter Skizze"
 
+msgid "New group mirroring active sketch"
+msgstr "Neue Gruppe mit gespiegelter Skizze"
+
 #: toolbar.cpp:76
 msgid "New group in new workplane (thru given entities)"
 msgstr "Neue Gruppe in neuer Arbeitsebene (definiert durch ausgewählte Objekte)"
@@ -1720,7 +1744,7 @@ msgstr "Wiederh."
 msgid "time"
 msgstr "Mal"
 msgid "times"
-msgstr "Male"
+msgstr "Mal"
 msgid "rotate"
 msgstr "Drehen"
 msgid "degrees"
@@ -2174,8 +2198,12 @@ msgid "union"
 msgstr "Vereinigung"
 msgid "difference"
 msgstr "Unterschied"
+msgid "intersect"
+msgstr "Schnittmenge"
 msgid "assemble"
 msgstr "Konstruktion"
+msgid "opacity"
+msgstr "Transparenz"
 msgid "suppress this group's solid model"
 msgstr "Festkörper dieser Gruppe unterdrücken"
 msgid "show entities from this group"
@@ -2224,6 +2252,8 @@ msgid "rotate"
 msgstr "Drehen"
 msgid "translate"
 msgstr "Versetzen"
+msgid "mirror"
+msgstr "Spiegeln"
 
 #: importdxf.cpp
 msgid "This %s file contains entities with non-zero Z coordinate; "
