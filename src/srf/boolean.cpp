@@ -16,6 +16,13 @@ void SShell::MakeFromDifferenceOf(SShell *a, SShell *b) {
     MakeFromBoolean(a, b, SSurface::CombineAs::DIFFERENCE);
 }
 
+void SShell::MakeFromIntersectionOf(SShell *a, SShell *b) {
+	SShell c = {};
+	c.MakeFromBoolean(a, b, SSurface::CombineAs::DIFFERENCE);
+    MakeFromBoolean(a, &c, SSurface::CombineAs::DIFFERENCE);
+    c.Clear();
+}
+
 //-----------------------------------------------------------------------------
 // Take our original pwl curve. Wherever an edge intersects a surface within
 // either agnstA or agnstB, split the piecewise linear element. Then refine

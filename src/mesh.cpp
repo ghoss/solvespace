@@ -288,6 +288,15 @@ void SMesh::MakeFromDifferenceOf(SMesh *a, SMesh *b) {
     AddAgainstBsp(a, bspb);
 }
 
+void SMesh::MakeFromIntersectionOf(SMesh *a, SMesh *b) {
+	SMesh c = {};
+
+	c.MakeFromDifferenceOf(a, b);
+	MakeFromDifferenceOf(a, &c);
+
+	c.Clear();
+}
+
 void SMesh::MakeFromCopyOf(SMesh *a) {
     int i;
     for(i = 0; i < a->l.n; i++) {

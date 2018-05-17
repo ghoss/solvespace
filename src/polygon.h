@@ -238,7 +238,7 @@ public:
     void Insert(STriangle *str, SMesh *instead);
     static SBsp3 *InsertOrCreate(SBsp3 *where, STriangle *str, SMesh *instead);
 
-	static void InsertConvex(SBsp3 **node, STriMeta meta, Vector *vec, size_t nc, 
+	static void InsertConvex(SBsp3 **node, STriMeta meta, Vector *vec, size_t nc,
 		SMesh *instead);
 
     void InsertInPlane(bool pos2, STriangle *tr, SMesh *m);
@@ -268,6 +268,7 @@ public:
     void AddAgainstBsp(SMesh *srcm, SBsp3 *bsp3);
     void MakeFromUnionOf(SMesh *a, SMesh *b);
     void MakeFromDifferenceOf(SMesh *a, SMesh *b);
+    void MakeFromIntersectionOf(SMesh *a, SMesh *b);
 
     void MakeFromCopyOf(SMesh *a);
     void MakeFromTransformationOf(SMesh *a, Vector trans,

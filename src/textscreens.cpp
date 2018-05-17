@@ -191,10 +191,13 @@ void TextWindow::ScreenChangeGroupOption(int link, uint32_t v) {
             if(g->type == Group::Type::EXTRUDE) {
                 // When an extrude group is first created, it's positioned for a union
                 // extrusion. If no constraints were added, flip it when we switch between
-                // union and difference modes to avoid manual work doing the smae.
-                if(g->meshCombine != (Group::CombineAs)v && g->GetNumConstraints() == 0 &&
-                        ((Group::CombineAs)v == Group::CombineAs::DIFFERENCE ||
-                        g->meshCombine == Group::CombineAs::DIFFERENCE)) {
+                // union and difference (or intersect) modes to avoid manual work
+                // doing the same.
+                if (g->meshCombine != (Group::CombineAs)v && g->GetNumConstraints() == 0 &&
+					(((Group::CombineAs)v == Group::CombineAs::DIFFERENCE ||
+					g->meshCombine == Group::CombineAs::DIFFERENCE) ||
+					((Group::CombineAs)v == Group::CombineAs::INTERSECT ||
+					g->meshCombine == Group::CombineAs::INTERSECT))) {
                     g->ExtrusionForceVectorTo(g->ExtrusionGetVector().Negated());
                 }
             }
@@ -332,7 +335,7 @@ void TextWindow::ShowGroupInfo() {
     } else if(g->type == Group::Type::LINKED) {
         Printf(true, "%Ft%s%E", _("link geometry from file"));
         Platform::Path relativePath = g->linkFile.RelativeTo(SS.saveFile.Parent());
-        Printf(false, "%Ba  '%s'", 
+        Printf(false, "%Ba  '%s'",
             relativePath.IsEmpty() ? g->linkFile.raw.c_str() : relativePath.raw.c_str());
         Printf(false, "%Bd%Ft%s%E %# %Fl%Ll%f%D[%s]%E",
         	_("scaled by"),
@@ -353,45 +356,58 @@ void TextWindow::ShowGroupInfo() {
     {
         bool un   = (g->meshCombine == Group::CombineAs::UNION);
         bool diff = (g->meshCombine == Group::CombineAs::DIFFERENCE);
+        bool ints = (g->meshCombine == Group::CombineAs::INTERSECT);
         bool asy  = (g->meshCombine == Group::CombineAs::ASSEMBLE);
 
         Printf(false, " %Ft%s", _("solid model as"));
-        Printf(false, "%Ba   %f%D%Lc%Fd%s %s%E  "
-                             "%f%D%Lc%Fd%s %s%E  "
-                             "%f%D%Lc%Fd%s %s%E  ",
+        Printf(false, "   %f%D%Lc%Fd%s %s%E",
             &TextWindow::ScreenChangeGroupOption,
             Group::CombineAs::UNION,
-            un ? RADIO_TRUE : RADIO_FALSE, _("union"),
+            un ? RADIO_TRUE : RADIO_FALSE, _("union")
+        );
+        Printf(false, "   %f%D%Lc%Fd%s %s%E",
             &TextWindow::ScreenChangeGroupOption,
             Group::CombineAs::DIFFERENCE,
-            diff ? RADIO_TRUE : RADIO_FALSE, _("difference"),
+            diff ? RADIO_TRUE : RADIO_FALSE, _("difference")
+        );
+        Printf(false, "   %f%D%Lc%Fd%s %s%E",
             &TextWindow::ScreenChangeGroupOption,
+            Group::CombineAs::INTERSECT,
+			ints ? RADIO_TRUE : RADIO_FALSE, _("intersect")
+		);
+		Printf(false, "   %f%D%Lc%Fd%s %s%E",
+			&TextWindow::ScreenChangeGroupOption,
             Group::CombineAs::ASSEMBLE,
-            (asy ? RADIO_TRUE : RADIO_FALSE), _("assemble"));
+            (asy ? RADIO_TRUE : RADIO_FALSE), _("assemble")
+        );
 
         if(g->type == Group::Type::EXTRUDE ||
            g->type == Group::Type::LATHE)
         {
-            Printf(false,
-                "%Bd   %Ftcolor   %E%Bz  %Bd (%@, %@, %@) %f%D%Lf%Fl[change]%E",
+            Printf(true,
+                "%Bd %Ft%s   %E%Bz  %Bd (%@, %@, %@) %f%D%Lf%Fl[%s]%E",
+                _("color"),
                 &g->color,
                 g->color.redF(), g->color.greenF(), g->color.blueF(),
-                ScreenColor, top[rows-1] + 2);
-            Printf(false, "%Bd   %Ftopacity%E %@ %f%Lf%Fl[change]%E",
+                ScreenColor, top[rows-1] + 2,
+                _("change")
+            );
+            Printf(false, "%Bd %Ft%s%E %@ %f%Lf%Fl[%s]%E",
+            	_("opacity"),
                 g->color.alphaF(),
-                &TextWindow::ScreenOpacity);
+                &TextWindow::ScreenOpacity,
+                _("change")
+            );
         }
 
         if(g->type == Group::Type::EXTRUDE ||
            g->type == Group::Type::LATHE ||
            g->type == Group::Type::LINKED) {
-            Printf(false, "   %Fd%f%LP%s  %s",
+            Printf(true, " %Fd%f%LP%s  %s",
                 &TextWindow::ScreenChangeGroupOption,
                 g->suppress ? CHECK_TRUE : CHECK_FALSE,
                 _("suppress this group's solid model"));
         }
-
-        Printf(false, "");
     }
 
     Printf(false, " %f%Lv%Fd%s  %s",
