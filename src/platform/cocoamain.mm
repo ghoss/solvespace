@@ -294,8 +294,8 @@ CONVERT(Rect)
         buttons & (1 << 0),
         buttons & (1 << 2),
         buttons & (1 << 1),
-        flags & NSShiftKeyMask,
-        flags & NSCommandKeyMask);
+        flags & NSEventModifierFlagShift,
+        flags & NSEventModifierFlagCommand);
 }
 
 - (void)mouseDragged:(NSEvent*)event {
@@ -356,9 +356,9 @@ CONVERT(Rect)
         chr = SolveSpace::GraphicsWindow::FUNCTION_KEY_BASE + (chr - NSF1FunctionKey);
 
     NSUInteger flags = [event modifierFlags];
-    if(flags & NSShiftKeyMask)
+    if(flags & NSEventModifierFlagShift)
         chr |= SolveSpace::GraphicsWindow::SHIFT_MASK;
-    if(flags & NSCommandKeyMask)
+    if(flags & NSEventModifierFlagCommand)
         chr |= SolveSpace::GraphicsWindow::CTRL_MASK;
 
     // override builtin behavior: "focus on next cell", "close window"
@@ -449,8 +449,8 @@ void InitGraphicsWindow() {
     GW = [[NSWindow alloc] init];
     GWDelegate = [[GraphicsWindowDelegate alloc] init];
     [GW setDelegate:GWDelegate];
-    [GW setStyleMask:(NSTitledWindowMask | NSClosableWindowMask |
-                      NSMiniaturizableWindowMask | NSResizableWindowMask)];
+    [GW setStyleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskClosable |
+                      NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable)];
     [GW setFrameAutosaveName:@"GraphicsWindow"];
     [GW setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
     if(![GW setFrameUsingName:[GW frameAutosaveName]])
@@ -654,9 +654,9 @@ void InitMainMenu(NSMenu *mainMenu) {
 
             NSUInteger modifierMask = 0;
             if(entry->accel & GraphicsWindow::SHIFT_MASK)
-                modifierMask |= NSShiftKeyMask;
+                modifierMask |= NSEventModifierFlagShift;
             else if(entry->accel & GraphicsWindow::CTRL_MASK)
-                modifierMask |= NSCommandKeyMask;
+                modifierMask |= NSEventModifierFlagCommand;
             [menuItem setKeyEquivalentModifierMask:modifierMask];
 
             [menuItem setTag:(NSInteger)entry];
@@ -754,7 +754,7 @@ bool SolveSpace::GetOpenFile(Platform::Path *filename, const std::string &defExt
     [filters removeObjectIdenticalTo:@"*"];
     [panel setAllowedFileTypes:filters];
 
-    if([panel runModal] == NSFileHandlingPanelOKButton) {
+    if([panel runModal] == NSModalResponseOK) {
         *filename = Platform::Path::From(
             [[NSFileManager defaultManager]
                 fileSystemRepresentationWithPath:[[panel URL] path]]);
@@ -836,7 +836,7 @@ bool SolveSpace::GetSaveFile(Platform::Path *filename, const std::string &defExt
                 stringByAppendingPathExtension:[extensions objectAtIndex:extensionIndex]]];
     }
 
-    if([panel runModal] == NSFileHandlingPanelOKButton) {
+    if([panel runModal] == NSModalResponseOK) {
         *filename = Platform::Path::From(
             [[NSFileManager defaultManager]
                 fileSystemRepresentationWithPath:[[panel URL] path]]);
@@ -1043,8 +1043,8 @@ namespace SolveSpace {
 void InitTextWindow() {
     TW = [[NSPanel alloc] init];
     TWDelegate = [[TextWindowDelegate alloc] init];
-    [TW setStyleMask:(NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask |
-                      NSUtilityWindowMask)];
+    [TW setStyleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | 
+    				NSWindowStyleMaskResizable | NSWindowStyleMaskUtilityWindow)];
     [[TW standardWindowButton:NSWindowMiniaturizeButton] setHidden:YES];
     [[TW standardWindowButton:NSWindowZoomButton] setHidden:YES];
     [TW setFrameAutosaveName:@"TextWindow"];
@@ -1122,7 +1122,7 @@ bool TextEditControlIsVisible() {
 
 void SolveSpace::DoMessageBox(const char *str, int rows, int cols, bool error) {
     NSAlert *alert = [[NSAlert alloc] init];
-    [alert setAlertStyle:(error ? NSWarningAlertStyle : NSInformationalAlertStyle)];
+    [alert setAlertStyle:(error ? NSAlertStyleWarning : NSAlertStyleInformational)];
     [alert addButtonWithTitle:Wrap(C_("button", "OK"))];
 
     /* do some additional formatting of the message;
@@ -1336,17 +1336,17 @@ static void connexionInit() {
             kConnexionClientModeTakeOver, kConnexionMaskButtons | kConnexionMaskAxis);
 
     // Monitor modifier flags to detect Shift button state changes
-    [NSEvent addLocalMonitorForEventsMatchingMask:(NSKeyDownMask | NSFlagsChangedMask)
-                                          handler:^(NSEvent *event) {
-        if (event.modifierFlags & NSShiftKeyMask) {
+    [NSEvent addLocalMonitorForEventsMatchingMask:(NSEventMaskKeyDown | 
+    	NSEventMaskFlagsChanged) handler:^(NSEvent *event) {
+        if (event.modifierFlags & NSEventModifierFlagShift) {
             connexionShiftIsDown = YES;
         }
         return event;
     }];
 
-    [NSEvent addLocalMonitorForEventsMatchingMask:(NSKeyUpMask | NSFlagsChangedMask)
-                                          handler:^(NSEvent *event) {
-        if (!(event.modifierFlags & NSShiftKeyMask)) {
+    [NSEvent addLocalMonitorForEventsMatchingMask:(NSEventMaskKeyUp | 
+    	NSEventMaskFlagsChanged) handler:^(NSEvent *event) {
+        if (!(event.modifierFlags & NSEventModifierFlagShift)) {
             connexionShiftIsDown = NO;
         }
         return event;

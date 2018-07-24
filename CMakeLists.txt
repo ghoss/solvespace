@@ -169,6 +169,11 @@ elseif(APPLE)
     find_package(PNG REQUIRED)
     find_package(Freetype REQUIRED)
 
+    # (GH) gettext by Homebrew
+    find_program(XGETTEXT xgettext PATHS /usr/local/opt/gettext/bin)
+    find_program(MSGINIT msginit PATHS /usr/local/opt/gettext/bin)
+    find_program(MSGMERGE msgmerge PATHS /usr/local/opt/gettext/bin)
+
     find_library(CAIRO_LIBRARIES cairo REQUIRED)
     find_path(CAIRO_INCLUDE_DIRS cairo.h PATH_SUFFIXES cairo)
 
